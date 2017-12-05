@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Animated } from "react-native";
 
 const skyblue = "#AFD4FF";
 const brown = "#E7A871";
@@ -88,7 +88,19 @@ const styles = StyleSheet.create({
   }
 });
 
+const moveTrain = (trainY, value, offset) => {
+  Animated.timing(trainY, {
+    toValue: value + offset
+  }).start(() => moveTrain(trainY, value, -offset));
+};
+
+const initialTrainY = -trainHeight / 2 - railwayHeight;
+
 class App extends Component {
+  state = { trainY: new Animated.Value(initialTrainY) };
+  componentDidMount() {
+    moveTrain(this.state.trainY, initialTrainY, -2.5);
+  }
   render() {
     return (
       <View style={styles.container}>
@@ -137,13 +149,13 @@ class App extends Component {
           />
         </View>
         <View style={styles.land}>
-          <View style={styles.train}>
+          <Animated.View style={[{ top: this.state.trainY }, styles.train]}>
             <View style={styles.window} />
             <View style={styles.window} />
             <View style={styles.window} />
             <View style={styles.window} />
             <View style={styles.window} />
-          </View>
+          </Animated.View>
         </View>
         <View style={styles.sign}>
           <Text style={styles.signText}>METRO TRANVIA MENDOZA</Text>
