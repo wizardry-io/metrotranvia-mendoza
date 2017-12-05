@@ -35,8 +35,7 @@ const styles = StyleSheet.create({
     height: trainHeight,
     backgroundColor: red,
     left: "50%",
-    transform: "translate(-50%,-50%)",
-    top: -trainHeight / 2 - railwayHeight,
+    transform: [{ translateX: "-50%" }, { translateY: "-50%" }],
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -53,7 +52,7 @@ const styles = StyleSheet.create({
     height: "50%",
     left: "50%",
     top: "30%",
-    transform: "translate(-50%,-50%)",
+    transform: [{ translateX: "-50%" }, { translateY: "-50%" }],
     backgroundColor: white,
     alignItems: "center",
     justifyContent: "center",
@@ -76,7 +75,7 @@ const styles = StyleSheet.create({
   },
   signText: {
     fontSize: 35,
-    fontWeight: 600,
+    fontWeight: "600",
     color: black,
     textAlign: "center",
     zIndex: 2
@@ -85,7 +84,7 @@ const styles = StyleSheet.create({
     backgroundColor: white,
     borderRadius: 10,
     position: "absolute",
-    transform: "translate(-50%,-50%)"
+    transform: [{ translateX: "-50%" }, { translateY: "-50%" }]
   }
 });
 
