@@ -5,6 +5,7 @@ const skyblue = "#AFD4FF";
 const brown = "#E7A871";
 const black = "#4A4A4A";
 const red = "#D0011B";
+const white = "#F8F8F8";
 
 const trainHeight = 100;
 const railwayHeight = 5;
@@ -45,6 +46,12 @@ const styles = StyleSheet.create({
     height: "50%",
     width: "10%",
     backgroundColor: black
+  },
+  cloud: {
+    backgroundColor: white,
+    borderRadius: 10,
+    position: "absolute",
+    transform: "translate(-50%,-50%)"
   }
 });
 
@@ -52,7 +59,50 @@ class App extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <View style={styles.sky} />
+        <View style={styles.sky}>
+          <View
+            style={[
+              { width: 30, height: "2.5%", top: "20%", left: "20%" },
+              styles.cloud
+            ]}
+          />
+          <View
+            style={[
+              { width: 50, height: "2.5%", top: "10%", left: "50%" },
+              styles.cloud
+            ]}
+          />
+          <View
+            style={[
+              { width: 35, height: "2.5%", top: "0%", left: "70%" },
+              styles.cloud
+            ]}
+          />
+          <View
+            style={[
+              { width: 35, height: "2.5%", top: "30%", left: "100%" },
+              styles.cloud
+            ]}
+          />
+          <View
+            style={[
+              { width: 50, height: "2.5%", top: "50%", left: "0%" },
+              styles.cloud
+            ]}
+          />
+          <View
+            style={[
+              { width: 60, height: "2.5%", top: "70%", left: "10%" },
+              styles.cloud
+            ]}
+          />
+          <View
+            style={[
+              { width: 60, height: "2.5%", top: "80%", left: "80%" },
+              styles.cloud
+            ]}
+          />
+        </View>
         <View style={styles.land}>
           <View style={styles.train}>
             <View style={styles.window} />
