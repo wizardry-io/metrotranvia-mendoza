@@ -85,6 +85,10 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     position: "absolute",
     transform: [{ translateX: "-50%" }, { translateY: "-50%" }]
+  },
+  clouds: {
+    width: "100%",
+    height: "100%"
   }
 });
 
@@ -94,59 +98,78 @@ const moveTrain = (trainY, value, offset) => {
   }).start(() => moveTrain(trainY, value, -offset));
 };
 
+const moveClouds = (initialValue, toValue = -1000) => {
+  const duration = toValue < 0 ? 0 : 2000; // Only animate clouds when going from right to left
+  Animated.timing(initialValue, {
+    toValue,
+    duration
+  }).start(() => moveClouds(initialValue, -toValue));
+};
+
 const initialTrainY = -trainHeight / 2 - railwayHeight;
 
 class App extends Component {
-  state = { trainY: new Animated.Value(initialTrainY) };
+  state = {
+    trainY: new Animated.Value(initialTrainY),
+    cloudsOffset: new Animated.Value(0)
+  };
   componentDidMount() {
     moveTrain(this.state.trainY, initialTrainY, -2.5);
+    moveClouds(this.state.cloudsOffset);
   }
   render() {
     return (
       <View style={styles.container}>
         <View style={styles.sky}>
-          <View
+          <Animated.View
             style={[
-              { width: 30, height: "2.5%", top: "20%", left: "20%" },
-              styles.cloud
+              { transform: [{ translateX: this.state.cloudsOffset }] },
+              styles.clouds
             ]}
-          />
-          <View
-            style={[
-              { width: 50, height: "2.5%", top: "10%", left: "50%" },
-              styles.cloud
-            ]}
-          />
-          <View
-            style={[
-              { width: 35, height: "2.5%", top: "0%", left: "70%" },
-              styles.cloud
-            ]}
-          />
-          <View
-            style={[
-              { width: 35, height: "2.5%", top: "30%", left: "100%" },
-              styles.cloud
-            ]}
-          />
-          <View
-            style={[
-              { width: 50, height: "2.5%", top: "50%", left: "0%" },
-              styles.cloud
-            ]}
-          />
-          <View
-            style={[
-              { width: 60, height: "2.5%", top: "70%", left: "10%" },
-              styles.cloud
-            ]}
-          />
-          <View
-            style={[
-              { width: 60, height: "2.5%", top: "80%", left: "80%" },
-              styles.cloud
-            ]}
-          />
+          >
+            <View
+              style={[
+                { width: 30, height: "2.5%", top: "20%", left: "20%" },
+                styles.cloud
+              ]}
+            />
+            <View
+              style={[
+                { width: 50, height: "2.5%", top: "10%", left: "50%" },
+                styles.cloud
+              ]}
+            />
+            <View
+              style={[
+                { width: 35, height: "2.5%", top: "0%", left: "70%" },
+                styles.cloud
+              ]}
+            />
+            <View
+              style={[
+                { width: 35, height: "2.5%", top: "30%", left: "100%" },
+                styles.cloud
+              ]}
+            />
+            <View
+              style={[
+                { width: 50, height: "2.5%", top: "50%", left: "0%" },
+                styles.cloud
+              ]}
+            />
+            <View
+              style={[
+                { width: 60, height: "2.5%", top: "70%", left: "10%" },
+                styles.cloud
+              ]}
+            />
+            <View
+              style={[
+                { width: 60, height: "2.5%", top: "80%", left: "80%" },
+                styles.cloud
+              ]}
+            />
+          </Animated.View>
         </View>
         <View style={styles.land}>
           <Animated.View style={[{ top: this.state.trainY }, styles.train]}>
