@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 
 const skyblue = "#AFD4FF";
 const brown = "#E7A871";
@@ -46,6 +46,40 @@ const styles = StyleSheet.create({
     height: "50%",
     width: "10%",
     backgroundColor: black
+  },
+  sign: {
+    position: "absolute",
+    width: "75%",
+    height: "50%",
+    left: "50%",
+    top: "30%",
+    transform: "translate(-50%,-50%)",
+    backgroundColor: white,
+    alignItems: "center",
+    justifyContent: "center",
+    borderStyle: "solid",
+    borderColor: black,
+    borderTopWidth: 20,
+    borderBottomWidth: 20,
+    borderLeftWidth: 10,
+    borderRightWidth: 10,
+    padding: 10,
+    maxWidth: 500,
+    maxHeight: 200
+  },
+  innerSign: {
+    position: "absolute",
+    height: "50%",
+    width: "100%",
+    backgroundColor: white,
+    boxShadow: `${black} 0px 1px 15px`
+  },
+  signText: {
+    fontSize: 35,
+    fontWeight: 600,
+    color: black,
+    textAlign: "center",
+    zIndex: 2
   },
   cloud: {
     backgroundColor: white,
@@ -111,6 +145,11 @@ class App extends Component {
             <View style={styles.window} />
             <View style={styles.window} />
           </View>
+        </View>
+        <View style={styles.sign}>
+          <Text style={styles.signText}>METRO TRANVIA MENDOZA</Text>
+          <View style={[{ top: 0 }, styles.innerSign]} />
+          <View style={[{ top: "50%" }, styles.innerSign]} />
         </View>
       </View>
     );
