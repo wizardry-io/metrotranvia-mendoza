@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, Text, StyleSheet, Animated } from "react-native";
+import { View, Text, StyleSheet, Animated, Dimensions } from "react-native";
 
 const skyblue = "#AFD4FF";
 const brown = "#E7A871";
@@ -98,8 +98,13 @@ const moveTrain = (trainY, value, offset) => {
   }).start(() => moveTrain(trainY, value, -offset));
 };
 
-const moveClouds = (initialValue, toValue = -1000) => {
-  const duration = toValue < 0 ? 0 : 2000; // Only animate clouds when going from right to left
+const moveClouds = (
+  initialValue,
+  toValue = -Dimensions.get("window").width - 100
+) => {
+  const windowWidth = Dimensions.get("window").width;
+  // Wide screens need more duration, otherwise the clouds only reach the middle of the screen
+  const duration = toValue < 0 ? 0 : windowWidth < 750 ? 2000 : windowWidth; // Only animate clouds when going from right to left
   Animated.timing(initialValue, {
     toValue,
     duration
