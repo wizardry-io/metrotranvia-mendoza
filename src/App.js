@@ -6,6 +6,7 @@ const brown = "#E7A871";
 const black = "#4A4A4A";
 const red = "#D0011B";
 const white = "#F8F8F8";
+const yellow = "rgba(255, 255, 5, 0.5)";
 
 const trainHeight = 100;
 const railwayHeight = 5;
@@ -38,13 +39,44 @@ const styles = StyleSheet.create({
     transform: [{ translateX: "-50%" }, { translateY: "-50%" }],
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
     maxWidth: 300
   },
   window: {
     height: "50%",
-    width: "10%",
+    width: "40%",
     backgroundColor: black
+  },
+  windowGroup: {
+    width: "25%",
+    height: "100%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center"
+  },
+  trainSeparator: {
+    position: "absolute",
+    width: 5,
+    height: "100%",
+    transform: [{ translateX: "-50%" }, { translateY: "-50%" }],
+    top: "50%",
+    left: "50%",
+    backgroundColor: black
+  },
+  trainFront: {
+    width: 10,
+    height: 10,
+    position: "absolute",
+    backgroundColor: black,
+    bottom: 5
+  },
+  trainLight: {
+    width: 20,
+    height: 20,
+    position: "absolute",
+    backgroundColor: yellow,
+    bottom: 80,
+    left: -20,
+    boxShadow: `${yellow} 0px 1px 15px`
   },
   sign: {
     position: "absolute",
@@ -178,11 +210,18 @@ class App extends Component {
         </View>
         <View style={styles.land}>
           <Animated.View style={[{ top: this.state.trainY }, styles.train]}>
-            <View style={styles.window} />
-            <View style={styles.window} />
-            <View style={styles.window} />
-            <View style={styles.window} />
-            <View style={styles.window} />
+            <View style={styles.windowGroup}>
+              <View style={styles.window} />
+              <View style={styles.window} />
+              <View style={[{ left: -10 }, styles.trainFront]} />
+              <View style={styles.trainLight} />
+            </View>
+            <View style={styles.trainSeparator} />
+            <View style={styles.windowGroup}>
+              <View style={styles.window} />
+              <View style={styles.window} />
+              <View style={[{ right: -10 }, styles.trainFront]} />
+            </View>
           </Animated.View>
         </View>
         <View style={styles.sign}>
