@@ -8,7 +8,7 @@ const red = "#D0011B";
 const white = "#F8F8F8";
 const yellow = "rgba(255, 255, 5, 0.5)";
 
-const trainHeight = 100;
+const trainHeight = Dimensions.get("window").height * 0.12;
 const railwayHeight = 5;
 
 const styles = StyleSheet.create({
@@ -70,22 +70,22 @@ const styles = StyleSheet.create({
     bottom: 5
   },
   trainLight: {
-    width: 20,
-    height: 20,
+    width: trainHeight / 5,
+    height: trainHeight / 5,
     position: "absolute",
     backgroundColor: yellow,
-    bottom: 80,
-    left: -20,
+    bottom: trainHeight * 0.8,
+    left: -trainHeight / 5,
     boxShadow: `${yellow} 0px 1px 15px`
   },
   sign: {
     position: "absolute",
-    width: "75%",
+    width: "100%",
     height: "50%",
     left: "50%",
-    top: "30%",
+    top: "50%",
     transform: [{ translateX: "-50%" }, { translateY: "-50%" }],
-    backgroundColor: white,
+    backgroundColor: black,
     alignItems: "center",
     justifyContent: "center",
     borderStyle: "solid",
@@ -95,13 +95,13 @@ const styles = StyleSheet.create({
     borderLeftWidth: 10,
     borderRightWidth: 10,
     padding: 10,
-    maxWidth: 500,
     maxHeight: 200
   },
   innerSign: {
     position: "absolute",
     height: "50%",
     width: "100%",
+    maxWidth: 500,
     backgroundColor: white,
     boxShadow: `${black} 0px 1px 15px`
   },
