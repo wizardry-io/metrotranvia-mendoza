@@ -331,7 +331,7 @@ class Sign extends Component {
       duration: 1000,
       delay: 1000
     }).start(() =>
-      this.setState({ text: "PEDRO MOLINA" }, () =>
+      this.setState({ text: this.props.currentStop }, () =>
         Animated.timing(this.state.signScale, {
           toValue: 1,
           duration: 1000
@@ -425,7 +425,7 @@ class App extends Component {
           minutesLeft="10'"
           nextTrainTime="12:45"
         />
-        <Sign />
+        <Sign currentStop="PEDRO MOLINA" />
         <TrainScene
           style={{ flex: 1 }}
           direction="right"
