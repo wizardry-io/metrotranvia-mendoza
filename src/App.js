@@ -186,10 +186,12 @@ const moveTrainY = (animatedTrainValue, value, offset) => {
   }).start(() => moveTrainY(animatedTrainValue, value, -offset));
 };
 
+const initialCloudOffset = Dimensions.get("window").width * 1.1;
+
 const moveClouds = (
   animatedCloudsValue,
   direction,
-  toValue = Dimensions.get("window").width * (direction === "left" ? 1 : -1)
+  toValue = initialCloudOffset * (direction === "left" ? -1 : 1)
 ) => {
   const isGoingRight = toValue > 0;
   const isGoingLeft = toValue < 0;
@@ -211,8 +213,7 @@ class TrainScene extends Component {
     trainX: new Animated.Value(0.5),
     trainY: new Animated.Value(initialTrainY),
     cloudsOffset: new Animated.Value(
-      Dimensions.get("window").width *
-        (this.props.direction === "left" ? -1 : 1)
+      initialCloudOffset * (this.props.direction === "left" ? -1 : 1)
     )
   };
   componentDidMount() {
