@@ -39,7 +39,6 @@ const styles = StyleSheet.create({
     width: "50%",
     height: trainHeight,
     backgroundColor: red,
-    left: "50%",
     transform: [{ translateX: "-50%" }, { translateY: "-50%" }],
     flexDirection: "row",
     justifyContent: "space-between",
@@ -120,10 +119,10 @@ const styles = StyleSheet.create({
   }
 });
 
-const moveTrain = (animatedTrainValue, value, offset) => {
+const moveTrainY = (animatedTrainValue, value, offset) => {
   Animated.timing(animatedTrainValue, {
     toValue: value + offset
-  }).start(() => moveTrain(animatedTrainValue, value, -offset));
+  }).start(() => moveTrainY(animatedTrainValue, value, -offset));
 };
 
 const moveClouds = (
@@ -148,6 +147,7 @@ const initialTrainY = -trainHeight / 2 - railwayHeight;
 
 class TrainScene extends Component {
   state = {
+    trainX: new Animated.Value(0.5),
     trainY: new Animated.Value(initialTrainY),
     cloudsOffset: new Animated.Value(
       Dimensions.get("window").width *
@@ -155,7 +155,12 @@ class TrainScene extends Component {
     )
   };
   componentDidMount() {
-    moveTrain(this.state.trainY, initialTrainY, -2.5);
+    moveTrainY(this.state.trainY, initialTrainY, -2.5);
+    Animated.timing(this.state.trainX, {
+      toValue: 1,
+      delay: 1000,
+      duration: 2000
+    }).start();
     moveClouds(this.state.cloudsOffset, this.props.direction);
   }
   render() {
@@ -213,7 +218,24 @@ class TrainScene extends Component {
           </Animated.View>
         </View>
         <View style={styles.land}>
-          <Animated.View style={[{ top: this.state.trainY }, styles.train]}>
+          <Animated.View
+            style={[
+              {
+                top: this.state.trainY,
+                left:
+                  this.props.direction === "left"
+                    ? this.state.trainX.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: ["0%", "100%"]
+                      })
+                    : this.state.trainX.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: ["100%", "0%"]
+                      })
+              },
+              styles.train
+            ]}
+          >
             <View style={styles.windowGroup}>
               <View style={styles.window} />
               <View style={styles.window} />
