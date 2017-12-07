@@ -432,24 +432,162 @@ class Sign extends Component {
   }
 }
 
+const stations = ["MENDOZA", "PEDRO MOLINA", "SAN MARTIN"];
+
+// Source: http://www.transportes.mendoza.gov.ar/mtm/
+const times = {
+  weekdays: {
+    MENDOZA: [
+      "6:35",
+      "6:52",
+      "7:09",
+      "7:26",
+      "7:43",
+      "8:00",
+      "8:17",
+      "8:34",
+      "8:51",
+      "9:08",
+      "9:25",
+      "9:42",
+      "9:59",
+      "10:16",
+      "10:33",
+      "10:50",
+      "11:07",
+      "11:24",
+      "11:41",
+      "11:58",
+      "12:15",
+      "12:32",
+      "12:49",
+      "13:06",
+      "13:23",
+      "13:40",
+      "13:57",
+      "14:14",
+      "14:31",
+      "14:48",
+      "15:10",
+      "15:27",
+      "15:44",
+      "16:01",
+      "16:18",
+      "16:35",
+      "16:52",
+      "17:09",
+      "17:26",
+      "17:43",
+      "18:00",
+      "18:17",
+      "18:34",
+      "18:51",
+      "19:08",
+      "19:25",
+      "19:42",
+      "19:59",
+      "20:16",
+      "20:33",
+      "20:50",
+      "21:07",
+      "21:24",
+      "21:41",
+      "21:58",
+      "22:12",
+      "22:47",
+      "23:17"
+    ],
+    "SAN MARTIN": [
+      "6:47",
+      "7:04",
+      "7:21",
+      "7:38",
+      "7:55",
+      "8:12",
+      "8:29",
+      "8:46",
+      "9:03",
+      "9:20",
+      "9:37",
+      "9:54",
+      "10:11",
+      "10:28",
+      "10:45",
+      "11:02",
+      "11:19",
+      "11:36",
+      "11:53",
+      "12:10",
+      "12:27",
+      "12:44",
+      "13:01",
+      "13:18",
+      "13:35",
+      "13:52",
+      "14:09",
+      "14:26",
+      "14:43",
+      "15:00",
+      "15:22",
+      "15:39",
+      "15:56",
+      "16:13",
+      "16:30",
+      "16:47",
+      "17:04",
+      "17:21",
+      "17:38",
+      "17:55",
+      "18:12",
+      "18:29",
+      "18:46",
+      "19:03",
+      "19:20",
+      "19:37",
+      "19:54",
+      "20:11",
+      "20:28",
+      "20:45",
+      "21:02",
+      "21:19",
+      "21:36",
+      "21:53",
+      "22:10",
+      "22:23",
+      "22:58",
+      "23:28"
+    ]
+  }
+};
+
 class App extends Component {
   render() {
+    const nextLeftTrainTime = times.weekdays.MENDOZA.find(time => {
+      const [hours, minutes] = time.split(":");
+      return new Date().setHours(hours, minutes) > new Date();
+    });
+    const nextRightTrainTime = times.weekdays["SAN MARTIN"].find(time => {
+      const [hours, minutes] = time.split(":");
+      return new Date().setHours(hours, minutes) > new Date();
+    });
     return (
       <View style={styles.container}>
         <TrainScene
           style={{ flex: 1 }}
           direction="left"
-          nextStop="25 DE MAYO"
-          minutesLeft="10'"
-          nextTrainTime="12:45"
+          nextStop="MENDOZA"
+          minutesLeft={`${nextLeftTrainTime.split(":")[1] -
+            new Date().getMinutes()}'`}
+          nextTrainTime={nextLeftTrainTime}
         />
         <Sign currentStop="PEDRO MOLINA" />
         <TrainScene
           style={{ flex: 1 }}
           direction="right"
-          nextStop="BELGRANO"
-          minutesLeft="5'"
-          nextTrainTime="12:40"
+          nextStop="SAN MARTIN"
+          minutesLeft={`${nextRightTrainTime.split(":")[1] -
+            new Date().getMinutes()}'`}
+          nextTrainTime={nextRightTrainTime}
         />
       </View>
     );
