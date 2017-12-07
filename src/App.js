@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from "react";
+import React, { Component } from "react";
 import { View, Text, StyleSheet, Animated, Dimensions } from "react-native";
 
 const skyblue = "#AFD4FF";
@@ -17,15 +17,19 @@ const styles = StyleSheet.create({
     height: "100%",
     overflow: "hidden"
   },
+  trainScene: {
+    display: "flex",
+    width: "100%"
+  },
   sky: {
     backgroundColor: skyblue,
     width: "100%",
-    height: "80%"
+    flex: 6 / 7
   },
   land: {
     backgroundColor: brown,
     width: "100%",
-    height: "20%",
+    flex: 1 / 7,
     borderTopStyle: "solid",
     borderTopColor: black,
     borderTopWidth: railwayHeight
@@ -39,7 +43,7 @@ const styles = StyleSheet.create({
     transform: [{ translateX: "-50%" }, { translateY: "-50%" }],
     flexDirection: "row",
     justifyContent: "space-between",
-    maxWidth: 300
+    maxWidth: trainHeight * 3
   },
   window: {
     height: "50%",
@@ -78,12 +82,8 @@ const styles = StyleSheet.create({
     boxShadow: `${yellow} 0px 1px 15px`
   },
   sign: {
-    position: "absolute",
     width: "100%",
-    height: "50%",
-    left: "50%",
-    top: "50%",
-    transform: [{ translateX: "-50%" }, { translateY: "-50%" }],
+    flex: 1,
     backgroundColor: black,
     alignItems: "center",
     justifyContent: "center",
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
     borderLeftWidth: 10,
     borderRightWidth: 10,
     padding: 10,
-    maxHeight: 200
+    zIndex: 1
   },
   innerSign: {
     position: "absolute",
@@ -163,7 +163,7 @@ class TrainScene extends Component {
   }
   render() {
     return (
-      <Fragment>
+      <View style={[this.props.style, styles.trainScene]}>
         <View style={styles.sky}>
           <Animated.View
             style={[
@@ -238,7 +238,7 @@ class TrainScene extends Component {
             </View>
           </Animated.View>
         </View>
-      </Fragment>
+      </View>
     );
   }
 }
@@ -247,12 +247,13 @@ class App extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <TrainScene direction="left" />
+        <TrainScene style={{ flex: 1 }} direction="left" />
         <View style={styles.sign}>
           <Text style={styles.signText}>METRO TRANVIA MENDOZA</Text>
           <View style={[{ top: 0 }, styles.innerSign]} />
           <View style={[{ top: "50%" }, styles.innerSign]} />
         </View>
+        <TrainScene style={{ flex: 1 }} direction="right" />
       </View>
     );
   }
