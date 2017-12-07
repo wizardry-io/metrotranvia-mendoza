@@ -170,43 +170,43 @@ class TrainScene extends Component {
           >
             <View
               style={[
-                { width: 30, height: "2.5%", top: "20%", left: "20%" },
+                { width: 30, height: 10, top: "20%", left: "20%" },
                 styles.cloud
               ]}
             />
             <View
               style={[
-                { width: 50, height: "2.5%", top: "10%", left: "50%" },
+                { width: 50, height: 10, top: "10%", left: "50%" },
                 styles.cloud
               ]}
             />
             <View
               style={[
-                { width: 35, height: "2.5%", top: "0%", left: "70%" },
+                { width: 35, height: 10, top: "0%", left: "70%" },
                 styles.cloud
               ]}
             />
             <View
               style={[
-                { width: 35, height: "2.5%", top: "30%", left: "100%" },
+                { width: 35, height: 10, top: "30%", left: "100%" },
                 styles.cloud
               ]}
             />
             <View
               style={[
-                { width: 50, height: "2.5%", top: "50%", left: "0%" },
+                { width: 50, height: 10, top: "50%", left: "0%" },
                 styles.cloud
               ]}
             />
             <View
               style={[
-                { width: 60, height: "2.5%", top: "70%", left: "10%" },
+                { width: 60, height: 10, top: "70%", left: "10%" },
                 styles.cloud
               ]}
             />
             <View
               style={[
-                { width: 60, height: "2.5%", top: "80%", left: "80%" },
+                { width: 60, height: 10, top: "80%", left: "80%" },
                 styles.cloud
               ]}
             />
