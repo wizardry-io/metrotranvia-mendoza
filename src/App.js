@@ -116,8 +116,52 @@ const styles = StyleSheet.create({
   clouds: {
     width: "100%",
     height: "100%"
+  },
+  nextTrainTime: {
+    top: -Dimensions.get("window").height / 4,
+    height: Dimensions.get("window").height / 4,
+    width: "35%",
+    transform: [{ translateX: "-50%" }],
+    alignItems: "center",
+    justifyContent: "center",
+    maxWidth: 300,
+    backgroundColor: black,
+    paddingLeft: 15,
+    paddingRight: 15,
+    paddingTop: 10,
+    paddingBottom: 10,
+    zIndex: 1
+  },
+  timeText: {
+    display: "flex",
+    backgroundColor: white,
+    width: "90%",
+    alignItems: "center",
+    justifyContent: "center",
+    margin: 2.5,
+    color: black
   }
 });
+
+class NextTrainTime extends Component {
+  render() {
+    return (
+      <Animated.View style={[this.props.style, styles.nextTrainTime]}>
+        <Text
+          style={[{ flex: 4, fontSize: 40, fontWeight: 600 }, styles.timeText]}
+        >
+          {this.props.minutesLeft}
+        </Text>
+        <Text style={[{ flex: 1, fontSize: 12 }, styles.timeText]}>
+          {this.props.nextTrainTime}
+        </Text>
+        <Text style={[{ flex: 2, fontSize: 10 }, styles.timeText]}>
+          {this.props.nextStop}
+        </Text>
+      </Animated.View>
+    );
+  }
+}
 
 const moveTrainY = (animatedTrainValue, value, offset) => {
   Animated.timing(animatedTrainValue, {
@@ -218,6 +262,20 @@ class TrainScene extends Component {
           </Animated.View>
         </View>
         <View style={styles.land}>
+          <NextTrainTime
+            nextStop={this.props.nextStop}
+            minutesLeft={this.props.minutesLeft}
+            nextTrainTime={this.props.nextTrainTime}
+            style={{
+              left: this.state.trainX.interpolate({
+                inputRange: [0, 1],
+                outputRange: [
+                  this.props.direction === "left" ? "-135%" : "210%",
+                  "50%"
+                ]
+              })
+            }}
+          />
           <Animated.View
             style={[
               {
@@ -360,9 +418,21 @@ class App extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <TrainScene style={{ flex: 1 }} direction="left" />
+        <TrainScene
+          style={{ flex: 1 }}
+          direction="left"
+          nextStop="25 DE MAYO"
+          minutesLeft="10'"
+          nextTrainTime="12:45"
+        />
         <Sign />
-        <TrainScene style={{ flex: 1 }} direction="right" />
+        <TrainScene
+          style={{ flex: 1 }}
+          direction="right"
+          nextStop="BELGRANO"
+          minutesLeft="5'"
+          nextTrainTime="12:40"
+        />
       </View>
     );
   }
