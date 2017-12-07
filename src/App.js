@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, Fragment } from "react";
 import { View, Text, StyleSheet, Animated, Dimensions } from "react-native";
 
 const skyblue = "#AFD4FF";
@@ -124,28 +124,28 @@ const styles = StyleSheet.create({
   }
 });
 
-const moveTrain = (trainY, value, offset) => {
-  Animated.timing(trainY, {
+const moveTrain = (animatedTrainValue, value, offset) => {
+  Animated.timing(animatedTrainValue, {
     toValue: value + offset
-  }).start(() => moveTrain(trainY, value, -offset));
+  }).start(() => moveTrain(animatedTrainValue, value, -offset));
 };
 
 const moveClouds = (
-  initialValue,
+  animatedCloudsValue,
   toValue = -Dimensions.get("window").width - 100
 ) => {
   const windowWidth = Dimensions.get("window").width;
   // Wide screens need more duration, otherwise the clouds only reach the middle of the screen
   const duration = toValue < 0 ? 0 : windowWidth < 750 ? 2000 : windowWidth; // Only animate clouds when going from right to left
-  Animated.timing(initialValue, {
+  Animated.timing(animatedCloudsValue, {
     toValue,
     duration
-  }).start(() => moveClouds(initialValue, -toValue));
+  }).start(() => moveClouds(animatedCloudsValue, -toValue));
 };
 
 const initialTrainY = -trainHeight / 2 - railwayHeight;
 
-class App extends Component {
+class TrainScene extends Component {
   state = {
     trainY: new Animated.Value(initialTrainY),
     cloudsOffset: new Animated.Value(0)
@@ -156,7 +156,7 @@ class App extends Component {
   }
   render() {
     return (
-      <View style={styles.container}>
+      <Fragment>
         <View style={styles.sky}>
           <Animated.View
             style={[
@@ -224,6 +224,16 @@ class App extends Component {
             </View>
           </Animated.View>
         </View>
+      </Fragment>
+    );
+  }
+}
+
+class App extends Component {
+  render() {
+    return (
+      <View style={styles.container}>
+        <TrainScene />
         <View style={styles.sign}>
           <Text style={styles.signText}>METRO TRANVIA MENDOZA</Text>
           <View style={[{ top: 0 }, styles.innerSign]} />
