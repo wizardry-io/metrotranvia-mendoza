@@ -75,7 +75,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     backgroundColor: yellow,
     bottom: trainHeight * 0.8,
-    left: -trainHeight / 5,
     boxShadow: `${yellow} 0px 1px 15px`
   },
   sign: {
@@ -132,15 +131,20 @@ const moveTrain = (animatedTrainValue, value, offset) => {
 
 const moveClouds = (
   animatedCloudsValue,
-  toValue = -Dimensions.get("window").width - 100
+  direction,
+  toValue = Dimensions.get("window").width * (direction === "left" ? 1 : -1)
 ) => {
-  const windowWidth = Dimensions.get("window").width;
-  // Wide screens need more duration, otherwise the clouds only reach the middle of the screen
-  const duration = toValue < 0 ? 0 : windowWidth < 750 ? 2000 : windowWidth; // Only animate clouds when going from right to left
+  const isGoingRight = toValue > 0;
+  const isGoingLeft = toValue < 0;
+  // To simulate movement to one direction, we animate clouds when they move to the opposite direction.
+  // For example, to simulate movement to the left, we animate clouds when they go to the right;
+  // and to simulate movement to the right, we animate clouds when they go to the left.
+  const shouldAnimate = direction === "left" ? isGoingRight : isGoingLeft;
+  const duration = shouldAnimate ? 2000 : 0;
   Animated.timing(animatedCloudsValue, {
     toValue,
     duration
-  }).start(() => moveClouds(animatedCloudsValue, -toValue));
+  }).start(() => moveClouds(animatedCloudsValue, direction, -toValue));
 };
 
 const initialTrainY = -trainHeight / 2 - railwayHeight;
@@ -148,11 +152,14 @@ const initialTrainY = -trainHeight / 2 - railwayHeight;
 class TrainScene extends Component {
   state = {
     trainY: new Animated.Value(initialTrainY),
-    cloudsOffset: new Animated.Value(0)
+    cloudsOffset: new Animated.Value(
+      Dimensions.get("window").width *
+        (this.props.direction === "left" ? -1 : 1)
+    )
   };
   componentDidMount() {
     moveTrain(this.state.trainY, initialTrainY, -2.5);
-    moveClouds(this.state.cloudsOffset);
+    moveClouds(this.state.cloudsOffset, this.props.direction);
   }
   render() {
     return (
@@ -214,13 +221,20 @@ class TrainScene extends Component {
               <View style={styles.window} />
               <View style={styles.window} />
               <View style={[{ left: -10 }, styles.trainFront]} />
-              <View style={styles.trainLight} />
+              {this.props.direction === "left" ? (
+                <View style={[styles.trainLight, { left: -trainHeight / 5 }]} />
+              ) : null}
             </View>
             <View style={styles.trainSeparator} />
             <View style={styles.windowGroup}>
               <View style={styles.window} />
               <View style={styles.window} />
               <View style={[{ right: -10 }, styles.trainFront]} />
+              {this.props.direction === "right" ? (
+                <View
+                  style={[styles.trainLight, { right: -trainHeight / 5 }]}
+                />
+              ) : null}
             </View>
           </Animated.View>
         </View>
@@ -233,7 +247,7 @@ class App extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <TrainScene />
+        <TrainScene direction="left" />
         <View style={styles.sign}>
           <Text style={styles.signText}>METRO TRANVIA MENDOZA</Text>
           <View style={[{ top: 0 }, styles.innerSign]} />
