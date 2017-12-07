@@ -85,15 +85,12 @@ const styles = StyleSheet.create({
     width: "100%",
     flex: 1,
     backgroundColor: black,
-    alignItems: "center",
-    justifyContent: "center",
     borderStyle: "solid",
     borderColor: black,
     borderTopWidth: 20,
     borderBottomWidth: 20,
     borderLeftWidth: 10,
     borderRightWidth: 10,
-    padding: 10,
     zIndex: 1
   },
   innerSign: {
@@ -243,16 +240,106 @@ class TrainScene extends Component {
   }
 }
 
+class Sign extends Component {
+  state = {
+    signScale: new Animated.Value(1),
+    text: "METRO TRANVIA MENDOZA"
+  };
+  componentDidMount() {
+    Animated.timing(this.state.signScale, {
+      toValue: 0,
+      duration: 1000,
+      delay: 1000
+    }).start(() =>
+      this.setState({ text: "PEDRO MOLINA" }, () =>
+        Animated.timing(this.state.signScale, {
+          toValue: 1,
+          duration: 1000
+        }).start()
+      )
+    );
+  }
+  render() {
+    return (
+      <View style={styles.sign}>
+        <Animated.View
+          style={[
+            {
+              top: 0,
+              left: 0,
+              right: 0,
+              marginRight: "auto",
+              marginLeft: "auto"
+            },
+            styles.innerSign
+          ]}
+        />
+        <Animated.View
+          style={[
+            {
+              top: "50%",
+              left: 0,
+              right: 0,
+              marginRight: "auto",
+              marginLeft: "auto"
+            },
+            styles.innerSign
+          ]}
+        />
+        <Animated.View
+          style={{
+            width: "100%",
+            height: "100%",
+            transform: [{ scaleY: this.state.signScale }],
+            alignItems: "center",
+            justifyContent: "center"
+          }}
+        >
+          <Text style={styles.signText}>{this.state.text}</Text>
+          <Animated.View
+            style={[
+              {
+                transform: [
+                  {
+                    skewX: this.state.signScale.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: ["10deg", "0deg"]
+                    })
+                  }
+                ],
+                top: 0
+              },
+              styles.innerSign
+            ]}
+          />
+          <Animated.View
+            style={[
+              {
+                transform: [
+                  {
+                    skewX: this.state.signScale.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: ["-10deg", "0deg"]
+                    })
+                  }
+                ],
+                top: "50%"
+              },
+              styles.innerSign
+            ]}
+          />
+        </Animated.View>
+      </View>
+    );
+  }
+}
+
 class App extends Component {
   render() {
     return (
       <View style={styles.container}>
         <TrainScene style={{ flex: 1 }} direction="left" />
-        <View style={styles.sign}>
-          <Text style={styles.signText}>METRO TRANVIA MENDOZA</Text>
-          <View style={[{ top: 0 }, styles.innerSign]} />
-          <View style={[{ top: "50%" }, styles.innerSign]} />
-        </View>
+        <Sign />
         <TrainScene style={{ flex: 1 }} direction="right" />
       </View>
     );
