@@ -148,14 +148,31 @@ class NextTrainTime extends Component {
     return (
       <Animated.View style={[this.props.style, styles.nextTrainTime]}>
         <Text
-          style={[{ flex: 4, fontSize: 40, fontWeight: 600 }, styles.timeText]}
+          style={[
+            {
+              flex: 4,
+              fontSize: Dimensions.get("window").height * 0.08,
+              fontWeight: 600
+            },
+            styles.timeText
+          ]}
         >
           {this.props.minutesLeft}
         </Text>
-        <Text style={[{ flex: 1, fontSize: 12 }, styles.timeText]}>
+        <Text
+          style={[
+            { flex: 1, fontSize: Dimensions.get("window").height * 0.02 },
+            styles.timeText
+          ]}
+        >
           {this.props.nextTrainTime}
         </Text>
-        <Text style={[{ flex: 2, fontSize: 10 }, styles.timeText]}>
+        <Text
+          style={[
+            { flex: 2, fontSize: Dimensions.get("window").height * 0.02 },
+            styles.timeText
+          ]}
+        >
           {this.props.nextStop}
         </Text>
       </Animated.View>
