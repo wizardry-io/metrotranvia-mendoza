@@ -147,8 +147,7 @@ const styles = StyleSheet.create({
     width: "90%",
     alignItems: "center",
     justifyContent: "center",
-    margin: 2.5,
-    color: black
+    margin: 2.5
   }
 });
 
@@ -181,7 +180,8 @@ class NextTrainTime extends Component {
                 flex: 4,
                 fontSize: Dimensions.get("window").height * 0.08,
                 fontWeight: "600",
-                opacity: this.state.opacity
+                opacity: this.state.opacity,
+                color: black
               }}
             >
               {this.state.minutesLeft}
@@ -195,7 +195,8 @@ class NextTrainTime extends Component {
                 {
                   flex: 1,
                   fontSize: Dimensions.get("window").height * 0.02,
-                  opacity: this.state.opacity
+                  opacity: this.state.opacity,
+                  color: black
                 }
               ]}
             >
@@ -204,14 +205,16 @@ class NextTrainTime extends Component {
           </View>
         )}
         {this.props.nextStop && (
-          <Text
-            style={[
-              { flex: 2, fontSize: Dimensions.get("window").height * 0.02 },
-              styles.timeText
-            ]}
-          >
-            {this.props.nextStop}
-          </Text>
+          <View style={styles.timeText}>
+            <Text
+              style={{
+                flex: 2,
+                fontSize: Dimensions.get("window").height * 0.02
+              }}
+            >
+              <Text style={{ color: black }}>{this.props.nextStop}</Text>
+            </Text>
+          </View>
         )}
       </Animated.View>
     );
