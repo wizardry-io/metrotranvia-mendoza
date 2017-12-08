@@ -153,32 +153,55 @@ const styles = StyleSheet.create({
 });
 
 class NextTrainTime extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      opacity: new Animated.Value(1),
+      minutesLeft: props.minutesLeft,
+      nextTrainTime: props.nextTrainTime
+    };
+  }
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.minutesLeft !== this.props.minutesLeft) {
+      Animated.timing(this.state.opacity, { toValue: 0 }).start(() => {
+        this.setState({ minutesLeft: nextProps.minutesLeft });
+        Animated.timing(this.state.opacity, {
+          toValue: 1
+        }).start();
+      });
+    }
+  }
   render() {
     return (
       <Animated.View style={[this.props.style, styles.nextTrainTime]}>
-        {this.props.minutesLeft && (
-          <Text
-            style={[
-              {
+        {this.state.minutesLeft && (
+          <View style={styles.timeText}>
+            <Animated.Text
+              style={{
                 flex: 4,
                 fontSize: Dimensions.get("window").height * 0.08,
-                fontWeight: 600
-              },
-              styles.timeText
-            ]}
-          >
-            {this.props.minutesLeft}
-          </Text>
+                fontWeight: "600",
+                opacity: this.state.opacity
+              }}
+            >
+              {this.state.minutesLeft}
+            </Animated.Text>
+          </View>
         )}
-        {this.props.nextTrainTime && (
-          <Text
-            style={[
-              { flex: 1, fontSize: Dimensions.get("window").height * 0.02 },
-              styles.timeText
-            ]}
-          >
-            {this.props.nextTrainTime}
-          </Text>
+        {this.state.nextTrainTime && (
+          <View style={styles.timeText}>
+            <Animated.Text
+              style={[
+                {
+                  flex: 1,
+                  fontSize: Dimensions.get("window").height * 0.02,
+                  opacity: this.state.opacity
+                }
+              ]}
+            >
+              {this.state.nextTrainTime}
+            </Animated.Text>
+          </View>
         )}
         {this.props.nextStop && (
           <Text
@@ -489,7 +512,18 @@ const differenceInMinutes = (date, anotherDate) => {
 };
 
 class App extends Component {
-  state = { currentStation: "PEDRO MOLINA" };
+  state = { currentStation: "PEDRO MOLINA", currentTime: new Date() };
+  componentDidMount() {
+    const secondsToMilliseconds = 1000;
+    const millisecondsUntilNextMinute =
+      (60 - new Date().getSeconds()) * secondsToMilliseconds;
+    // When the next minute starts
+    setTimeout(() => {
+      this.setState({ currentTime: new Date() });
+      // Update time every one minute
+      setInterval(() => this.setState({ currentTime: new Date() }), 60 * 1000);
+    }, millisecondsUntilNextMinute);
+  }
   onSwipeRight = gestureState => {
     const currentStationIndex = stations.indexOf(this.state.currentStation);
     const isFirst = currentStationIndex === 0;
@@ -530,7 +564,7 @@ class App extends Component {
       times.weekdays[this.state.currentStation].mendozaGutierrezDirection.find(
         time => {
           const [hours, minutes] = time.split(":");
-          return new Date().setHours(hours, minutes) > new Date();
+          return new Date().setHours(hours, minutes) > this.state.currentTime;
         }
       );
     const nextRightTrainTime =
@@ -538,7 +572,7 @@ class App extends Component {
       times.weekdays[this.state.currentStation].gutierrezMendozaDirection.find(
         time => {
           const [hours, minutes] = time.split(":");
-          return new Date().setHours(hours, minutes) > new Date();
+          return new Date().setHours(hours, minutes) > this.state.currentTime;
         }
       );
     return (
@@ -565,7 +599,7 @@ class App extends Component {
                   nextLeftTrainTime.split(":")[0],
                   nextLeftTrainTime.split(":")[1]
                 ),
-                new Date()
+                this.state.currentTime
               )}'`
             }
             nextTrainTime={nextLeftTrainTime}
@@ -587,7 +621,7 @@ class App extends Component {
                   nextRightTrainTime.split(":")[0],
                   nextRightTrainTime.split(":")[1]
                 ),
-                new Date()
+                this.state.currentTime
               )}'`
             }
             nextTrainTime={nextRightTrainTime}
