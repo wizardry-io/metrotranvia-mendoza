@@ -467,7 +467,7 @@ const stations = [
 const differenceInMinutes = (date, anotherDate) => {
   const millisecondsToSeconds = 1 / 1000;
   const secondsToMinutes = 1 / 60;
-  return (
+  return Math.trunc(
     Math.abs(date - anotherDate) * millisecondsToSeconds * secondsToMinutes
   );
 };
@@ -531,7 +531,7 @@ class App extends Component {
           <TrainScene
             style={{ flex: 1 }}
             direction="left"
-            nextStop={leftStation}
+            nextStop={leftStation ? "MENDOZA" : null}
             minutesLeft={
               nextLeftTrainTime &&
               `${differenceInMinutes(
@@ -548,7 +548,7 @@ class App extends Component {
           <TrainScene
             style={{ flex: 1 }}
             direction="right"
-            nextStop={rightStation}
+            nextStop={rightStation ? "GUTIERREZ" : null}
             minutesLeft={
               nextRightTrainTime &&
               `${differenceInMinutes(
