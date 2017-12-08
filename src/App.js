@@ -455,7 +455,14 @@ class Sign extends Component {
   }
 }
 
-const stations = ["MENDOZA", "PEDRO MOLINA", "SAN MARTIN"];
+const stations = [
+  "MENDOZA",
+  "PEDRO MOLINA",
+  "SAN MARTIN",
+  "PROGRESO",
+  "LUZURIAGA",
+  "GUTIERREZ"
+];
 
 const differenceInMinutes = (date, anotherDate) => {
   const millisecondsToSeconds = 1 / 1000;
