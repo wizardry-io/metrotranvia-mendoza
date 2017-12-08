@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { View, Text, StyleSheet, Animated, Dimensions } from "react-native";
+import GestureRecognizer, { swipeDirections } from "./GestureRecognizer";
 
 const skyblue = "#AFD4FF";
 const brown = "#E7A871";
@@ -147,34 +148,40 @@ class NextTrainTime extends Component {
   render() {
     return (
       <Animated.View style={[this.props.style, styles.nextTrainTime]}>
-        <Text
-          style={[
-            {
-              flex: 4,
-              fontSize: Dimensions.get("window").height * 0.08,
-              fontWeight: 600
-            },
-            styles.timeText
-          ]}
-        >
-          {this.props.minutesLeft}
-        </Text>
-        <Text
-          style={[
-            { flex: 1, fontSize: Dimensions.get("window").height * 0.02 },
-            styles.timeText
-          ]}
-        >
-          {this.props.nextTrainTime}
-        </Text>
-        <Text
-          style={[
-            { flex: 2, fontSize: Dimensions.get("window").height * 0.02 },
-            styles.timeText
-          ]}
-        >
-          {this.props.nextStop}
-        </Text>
+        {this.props.minutesLeft && (
+          <Text
+            style={[
+              {
+                flex: 4,
+                fontSize: Dimensions.get("window").height * 0.08,
+                fontWeight: 600
+              },
+              styles.timeText
+            ]}
+          >
+            {this.props.minutesLeft}
+          </Text>
+        )}
+        {this.props.nextTrainTime && (
+          <Text
+            style={[
+              { flex: 1, fontSize: Dimensions.get("window").height * 0.02 },
+              styles.timeText
+            ]}
+          >
+            {this.props.nextTrainTime}
+          </Text>
+        )}
+        {this.props.nextStop && (
+          <Text
+            style={[
+              { flex: 2, fontSize: Dimensions.get("window").height * 0.02 },
+              styles.timeText
+            ]}
+          >
+            {this.props.nextStop}
+          </Text>
+        )}
       </Animated.View>
     );
   }
@@ -357,6 +364,21 @@ class Sign extends Component {
       )
     );
   }
+  componentDidUpdate() {
+    if (this.props.currentStop !== this.state.text) {
+      Animated.timing(this.state.signScale, {
+        toValue: 0,
+        duration: 500
+      }).start(() =>
+        this.setState({ text: this.props.currentStop }, () =>
+          Animated.timing(this.state.signScale, {
+            toValue: 1,
+            duration: 500
+          }).start()
+        )
+      );
+    }
+  }
   render() {
     return (
       <View style={styles.sign}>
@@ -497,6 +519,66 @@ const times = {
       "22:47",
       "23:17"
     ],
+    "PEDRO MOLINA": [
+      "6:40",
+      "6:57",
+      "7:14",
+      "7:31",
+      "7:48",
+      "8:05",
+      "8:22",
+      "8:39",
+      "8:56",
+      "9:13",
+      "9:30",
+      "9:47",
+      "10:04",
+      "10:21",
+      "10:38",
+      "10:55",
+      "11:12",
+      "11:29",
+      "11:46",
+      "12:03",
+      "12:20",
+      "12:37",
+      "12:54",
+      "13:11",
+      "13:28",
+      "13:45",
+      "14:02",
+      "14:19",
+      "14:36",
+      "14:53",
+      "15:15",
+      "15:32",
+      "15:49",
+      "16:06",
+      "16:23",
+      "16:40",
+      "16:57",
+      "17:14",
+      "17:31",
+      "17:48",
+      "18:05",
+      "18:22",
+      "18:39",
+      "18:56",
+      "19:13",
+      "19:30",
+      "19:47",
+      "20:04",
+      "20:21",
+      "20:38",
+      "20:55",
+      "21:12",
+      "21:29",
+      "21:46",
+      "22:03",
+      "22:16",
+      "22:51",
+      "23:21"
+    ],
     "SAN MARTIN": [
       "6:47",
       "7:04",
@@ -560,36 +642,101 @@ const times = {
   }
 };
 
+const differenceInMinutes = (date, anotherDate) => {
+  const millisecondsToSeconds = 1 / 1000;
+  const secondsToMinutes = 1 / 60;
+  return (
+    Math.abs(date - anotherDate) * millisecondsToSeconds * secondsToMinutes
+  );
+};
+
 class App extends Component {
+  state = { currentStation: "PEDRO MOLINA" };
+  onSwipeRight = gestureState => {
+    const currentStationIndex = stations.indexOf(this.state.currentStation);
+    const isFirst = currentStationIndex === 0;
+    if (isFirst) {
+      return;
+    }
+    this.setState({
+      currentStation: stations[currentStationIndex - 1]
+    });
+  };
+  onSwipeLeft = gestureState => {
+    const currentStationIndex = stations.indexOf(this.state.currentStation);
+    const isLast = currentStationIndex === stations.length - 1;
+    if (isLast) {
+      return;
+    }
+    this.setState({
+      currentStation: stations[currentStationIndex + 1]
+    });
+  };
   render() {
-    const nextLeftTrainTime = times.weekdays.MENDOZA.find(time => {
-      const [hours, minutes] = time.split(":");
-      return new Date().setHours(hours, minutes) > new Date();
-    });
-    const nextRightTrainTime = times.weekdays["SAN MARTIN"].find(time => {
-      const [hours, minutes] = time.split(":");
-      return new Date().setHours(hours, minutes) > new Date();
-    });
+    const leftStation =
+      stations[stations.indexOf(this.state.currentStation) - 1];
+    const rightStation =
+      stations[stations.indexOf(this.state.currentStation) + 1];
+    const nextLeftTrainTime =
+      leftStation &&
+      times.weekdays[leftStation].find(time => {
+        const [hours, minutes] = time.split(":");
+        return new Date().setHours(hours, minutes) > new Date();
+      });
+    const nextRightTrainTime =
+      rightStation &&
+      times.weekdays[rightStation].find(time => {
+        const [hours, minutes] = time.split(":");
+        return new Date().setHours(hours, minutes) > new Date();
+      });
     return (
-      <View style={styles.container}>
-        <TrainScene
-          style={{ flex: 1 }}
-          direction="left"
-          nextStop="MENDOZA"
-          minutesLeft={`${nextLeftTrainTime.split(":")[1] -
-            new Date().getMinutes()}'`}
-          nextTrainTime={nextLeftTrainTime}
-        />
-        <Sign currentStop="PEDRO MOLINA" />
-        <TrainScene
-          style={{ flex: 1 }}
-          direction="right"
-          nextStop="SAN MARTIN"
-          minutesLeft={`${nextRightTrainTime.split(":")[1] -
-            new Date().getMinutes()}'`}
-          nextTrainTime={nextRightTrainTime}
-        />
-      </View>
+      <GestureRecognizer
+        onSwipeLeft={this.onSwipeLeft}
+        onSwipeRight={this.onSwipeRight}
+        config={{
+          velocityThreshold: 0.1,
+          directionalOffsetThreshold: 50
+        }}
+        style={{
+          height: "100%"
+        }}
+      >
+        <View style={styles.container}>
+          <TrainScene
+            style={{ flex: 1 }}
+            direction="left"
+            nextStop={leftStation}
+            minutesLeft={
+              nextLeftTrainTime &&
+              `${differenceInMinutes(
+                new Date().setHours(
+                  nextLeftTrainTime.split(":")[0],
+                  nextLeftTrainTime.split(":")[1]
+                ),
+                new Date()
+              )}'`
+            }
+            nextTrainTime={nextLeftTrainTime}
+          />
+          <Sign currentStop={this.state.currentStation} />
+          <TrainScene
+            style={{ flex: 1 }}
+            direction="right"
+            nextStop={rightStation}
+            minutesLeft={
+              nextRightTrainTime &&
+              `${differenceInMinutes(
+                new Date().setHours(
+                  nextRightTrainTime.split(":")[0],
+                  nextRightTrainTime.split(":")[1]
+                ),
+                new Date()
+              )}'`
+            }
+            nextTrainTime={nextRightTrainTime}
+          />
+        </View>
+      </GestureRecognizer>
     );
   }
 }
