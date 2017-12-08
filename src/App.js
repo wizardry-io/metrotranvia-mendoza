@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
     width: "50%",
     height: trainHeight,
     backgroundColor: red,
-    transform: [{ translateX: "-50%" }, { translateY: "-50%" }],
+    transform: [{ translateY: "-50%" }],
     flexDirection: "row",
     justifyContent: "space-between",
     maxWidth: trainHeight * 3
@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
   nextTrainTime: {
     top: -Dimensions.get("window").height / 4,
     height: Dimensions.get("window").height / 4,
-    width: "35%",
+    width: "50%",
     transform: [{ translateX: "-50%" }],
     alignItems: "center",
     justifyContent: "center",
@@ -193,7 +193,8 @@ class NextTrainTime extends Component {
                 fontSize: Dimensions.get("window").height * 0.08,
                 fontWeight: "600",
                 opacity: this.state.minutesLeftOpacity,
-                color: black
+                color: black,
+                padding: 2.5
               }}
             >
               {this.state.minutesLeft}
@@ -207,7 +208,8 @@ class NextTrainTime extends Component {
                 {
                   fontSize: Dimensions.get("window").height * 0.04,
                   opacity: this.state.nextTrainTimeOpacity,
-                  color: black
+                  color: black,
+                  padding: 2.5
                 }
               ]}
             >
@@ -220,7 +222,8 @@ class NextTrainTime extends Component {
             <Text
               style={{
                 fontSize: Dimensions.get("window").height * 0.02,
-                color: black
+                color: black,
+                padding: 2.5
               }}
             >
               <Text style={{ color: black }}>{this.props.nextStop}</Text>
@@ -353,12 +356,16 @@ class TrainScene extends Component {
                 left:
                   this.props.direction === "left"
                     ? this.state.trainX.interpolate({
-                        inputRange: [0, 1],
-                        outputRange: ["0%", "100%"]
-                      })
-                    : this.state.trainX.interpolate({
-                        inputRange: [0, 1],
-                        outputRange: ["100%", "0%"]
+                      inputRange: [0, 1],
+                      outputRange: ["0%", "87.5%"]
+                    })
+                  : "auto",
+                right:
+                  this.props.direction === "left"
+                    ? "auto"
+                  : this.state.trainX.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: ["-12.5%", "87.5%"]
                       })
               },
               styles.train
