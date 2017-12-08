@@ -1,5 +1,12 @@
 import React, { Component } from "react";
-import { View, Text, StyleSheet, Animated, Dimensions } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Animated,
+  Dimensions,
+  AsyncStorage
+} from "react-native";
 import GestureRecognizer, { swipeDirections } from "./GestureRecognizer";
 import times from "./times.json"; // Source: http://www.transportes.mendoza.gov.ar/mtm/
 
@@ -356,14 +363,23 @@ class Sign extends Component {
       toValue: 0,
       duration: 1000,
       delay: 1000
-    }).start(() =>
-      this.setState({ text: this.props.currentStop }, () =>
-        Animated.timing(this.state.signScale, {
-          toValue: 1,
-          duration: 1000
-        }).start()
-      )
-    );
+    }).start(() => {
+      AsyncStorage.getItem("METROTRANVIA_MENDOZA_CURRENT_STATION").then(
+        currentStation => {
+          if (currentStation) {
+            this.props.onCurrentStation(currentStation);
+          }
+          this.setState(
+            { text: currentStation || this.props.currentStop },
+            () =>
+              Animated.timing(this.state.signScale, {
+                toValue: 1,
+                duration: 1000
+              }).start()
+          );
+        }
+      );
+    });
   }
   componentDidUpdate() {
     if (this.props.currentStop !== this.state.text) {
@@ -480,9 +496,14 @@ class App extends Component {
     if (isFirst) {
       return;
     }
+    const currentStation = stations[currentStationIndex - 1];
     this.setState({
-      currentStation: stations[currentStationIndex - 1]
+      currentStation
     });
+    AsyncStorage.setItem(
+      "METROTRANVIA_MENDOZA_CURRENT_STATION",
+      currentStation
+    );
   };
   onSwipeLeft = gestureState => {
     const currentStationIndex = stations.indexOf(this.state.currentStation);
@@ -490,9 +511,14 @@ class App extends Component {
     if (isLast) {
       return;
     }
+    const currentStation = stations[currentStationIndex + 1];
     this.setState({
-      currentStation: stations[currentStationIndex + 1]
+      currentStation
     });
+    AsyncStorage.setItem(
+      "METROTRANVIA_MENDOZA_CURRENT_STATION",
+      currentStation
+    );
   };
   render() {
     const leftStation =
@@ -544,7 +570,12 @@ class App extends Component {
             }
             nextTrainTime={nextLeftTrainTime}
           />
-          <Sign currentStop={this.state.currentStation} />
+          <Sign
+            currentStop={this.state.currentStation}
+            onCurrentStation={currentStation =>
+              this.setState({ currentStation })
+            }
+          />
           <TrainScene
             style={{ flex: 1 }}
             direction="right"
