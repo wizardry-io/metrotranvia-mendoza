@@ -155,19 +155,32 @@ class NextTrainTime extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      opacity: new Animated.Value(1),
+      minutesLeftOpacity: new Animated.Value(1),
+      nextTrainTimeOpacity: new Animated.Value(1),
       minutesLeft: props.minutesLeft,
       nextTrainTime: props.nextTrainTime
     };
   }
   componentWillReceiveProps(nextProps) {
     if (nextProps.minutesLeft !== this.props.minutesLeft) {
-      Animated.timing(this.state.opacity, { toValue: 0 }).start(() => {
-        this.setState({ minutesLeft: nextProps.minutesLeft });
-        Animated.timing(this.state.opacity, {
-          toValue: 1
-        }).start();
-      });
+      Animated.timing(this.state.minutesLeftOpacity, { toValue: 0 }).start(
+        () => {
+          this.setState({ minutesLeft: nextProps.minutesLeft });
+          Animated.timing(this.state.minutesLeftOpacity, {
+            toValue: 1
+          }).start();
+        }
+      );
+    }
+    if (nextProps.nextTrainTime !== this.props.nextTrainTime) {
+      Animated.timing(this.state.nextTrainTimeOpacity, { toValue: 0 }).start(
+        () => {
+          this.setState({ nextTrainTime: nextProps.nextTrainTime });
+          Animated.timing(this.state.nextTrainTimeOpacity, {
+            toValue: 1
+          }).start();
+        }
+      );
     }
   }
   render() {
@@ -177,10 +190,9 @@ class NextTrainTime extends Component {
           <View style={styles.timeText}>
             <Animated.Text
               style={{
-                flex: 4,
                 fontSize: Dimensions.get("window").height * 0.08,
                 fontWeight: "600",
-                opacity: this.state.opacity,
+                opacity: this.state.minutesLeftOpacity,
                 color: black
               }}
             >
@@ -193,9 +205,8 @@ class NextTrainTime extends Component {
             <Animated.Text
               style={[
                 {
-                  flex: 1,
-                  fontSize: Dimensions.get("window").height * 0.02,
-                  opacity: this.state.opacity,
+                  fontSize: Dimensions.get("window").height * 0.04,
+                  opacity: this.state.nextTrainTimeOpacity,
                   color: black
                 }
               ]}
@@ -208,8 +219,8 @@ class NextTrainTime extends Component {
           <View style={styles.timeText}>
             <Text
               style={{
-                flex: 2,
-                fontSize: Dimensions.get("window").height * 0.02
+                fontSize: Dimensions.get("window").height * 0.02,
+                color: black
               }}
             >
               <Text style={{ color: black }}>{this.props.nextStop}</Text>
