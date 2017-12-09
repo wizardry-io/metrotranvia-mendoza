@@ -5,7 +5,9 @@ import {
   StyleSheet,
   Animated,
   Dimensions,
-  AsyncStorage
+  AsyncStorage,
+  TouchableWithoutFeedback,
+  ScrollView
 } from "react-native";
 import GestureRecognizer, { swipeDirections } from "./GestureRecognizer";
 import times from "./times.json"; // Source: http://www.transportes.mendoza.gov.ar/mtm/
@@ -144,14 +146,20 @@ const styles = StyleSheet.create({
   timeText: {
     display: "flex",
     backgroundColor: white,
-    width: "90%",
+    width: "100%",
     alignItems: "center",
     justifyContent: "center",
-    margin: 2.5
+    marginBottom: 2.5
+  },
+  timesList: {
+    display: "flex",
+    flex: 1,
+    width: "100%",
+    backgroundColor: white
   }
 });
 
-class NextTrainTime extends Component {
+class TrainTime extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -186,49 +194,77 @@ class NextTrainTime extends Component {
   render() {
     return (
       <Animated.View style={[this.props.style, styles.nextTrainTime]}>
-        {this.state.minutesLeft && (
-          <View style={styles.timeText}>
-            <Animated.Text
-              style={{
-                fontSize: Dimensions.get("window").height * 0.08,
-                fontWeight: "600",
-                opacity: this.state.minutesLeftOpacity,
-                color: black,
-                padding: 2.5
-              }}
-            >
-              {this.state.minutesLeft}
-            </Animated.Text>
+        {this.props.mode === "minutesLeft" ? (
+          <View
+            style={{
+              width: "100%",
+              height: "100%",
+              justifyContent: "space-between"
+            }}
+          >
+            {this.state.minutesLeft && (
+              <View style={styles.timeText}>
+                <Animated.Text
+                  style={{
+                    fontSize: Dimensions.get("window").height * 0.08,
+                    fontWeight: "600",
+                    opacity: this.state.minutesLeftOpacity,
+                    color: black,
+                    padding: 2.5
+                  }}
+                >
+                  {this.state.minutesLeft}
+                </Animated.Text>
+              </View>
+            )}
+            {this.state.nextTrainTime && (
+              <View style={styles.timeText}>
+                <Animated.Text
+                  style={[
+                    {
+                      fontSize: Dimensions.get("window").height * 0.04,
+                      opacity: this.state.nextTrainTimeOpacity,
+                      color: black,
+                      padding: 2.5
+                    }
+                  ]}
+                >
+                  {this.state.nextTrainTime}
+                </Animated.Text>
+              </View>
+            )}
+            {this.props.nextStop && (
+              <View style={[styles.timeText, { marginBottom: 0 }]}>
+                <Text
+                  style={{
+                    fontSize: Dimensions.get("window").height * 0.02,
+                    color: black,
+                    padding: 2.5
+                  }}
+                >
+                  <Text style={{ color: black }}>{this.props.nextStop}</Text>
+                </Text>
+              </View>
+            )}
           </View>
-        )}
-        {this.state.nextTrainTime && (
-          <View style={styles.timeText}>
-            <Animated.Text
-              style={[
-                {
-                  fontSize: Dimensions.get("window").height * 0.04,
-                  opacity: this.state.nextTrainTimeOpacity,
-                  color: black,
-                  padding: 2.5
-                }
-              ]}
-            >
-              {this.state.nextTrainTime}
-            </Animated.Text>
-          </View>
-        )}
-        {this.props.nextStop && (
-          <View style={styles.timeText}>
-            <Text
-              style={{
-                fontSize: Dimensions.get("window").height * 0.02,
-                color: black,
-                padding: 2.5
-              }}
-            >
-              <Text style={{ color: black }}>{this.props.nextStop}</Text>
-            </Text>
-          </View>
+        ) : (
+          <ScrollView
+            style={styles.timesList}
+            contentContainerStyle={{
+              alignItems: "center",
+              justifyContent: "center"
+            }}
+          >
+            {times.weekdays[this.props.currentStation][
+              this.props.direction === "left"
+                ? "mendozaGutierrezDirection"
+                : "gutierrezMendozaDirection"
+            ].map(time => (
+              <Text key={time} style={{ margin: 5, color: black }}>
+                {time}
+              </Text>
+            ))}
+          </ScrollView>
         )}
       </Animated.View>
     );
@@ -269,7 +305,8 @@ class TrainScene extends Component {
     trainY: new Animated.Value(initialTrainY),
     cloudsOffset: new Animated.Value(
       initialCloudOffset * (this.props.direction === "left" ? -1 : 1)
-    )
+    ),
+    mode: "minutesLeft"
   };
   componentDidMount() {
     moveTrainY(this.state.trainY, initialTrainY, -2.5);
@@ -282,117 +319,130 @@ class TrainScene extends Component {
   }
   render() {
     return (
-      <View style={[this.props.style, styles.trainScene]}>
-        <View style={styles.sky}>
-          <Animated.View
-            style={[
-              { transform: [{ translateX: this.state.cloudsOffset }] },
-              styles.clouds
-            ]}
-          >
-            <View
+      <TouchableWithoutFeedback
+        onPress={() =>
+          this.setState(state => ({
+            mode: state.mode === "minutesLeft" ? "timeList" : "minutesLeft"
+          }))
+        }
+      >
+        <View style={[this.props.style, styles.trainScene]}>
+          <View style={styles.sky}>
+            <Animated.View
               style={[
-                { width: 30, height: 10, top: "20%", left: "20%" },
-                styles.cloud
+                { transform: [{ translateX: this.state.cloudsOffset }] },
+                styles.clouds
               ]}
+            >
+              <View
+                style={[
+                  { width: 30, height: 10, top: "20%", left: "20%" },
+                  styles.cloud
+                ]}
+              />
+              <View
+                style={[
+                  { width: 50, height: 10, top: "10%", left: "50%" },
+                  styles.cloud
+                ]}
+              />
+              <View
+                style={[
+                  { width: 35, height: 10, top: "0%", left: "70%" },
+                  styles.cloud
+                ]}
+              />
+              <View
+                style={[
+                  { width: 35, height: 10, top: "30%", left: "100%" },
+                  styles.cloud
+                ]}
+              />
+              <View
+                style={[
+                  { width: 50, height: 10, top: "50%", left: "0%" },
+                  styles.cloud
+                ]}
+              />
+              <View
+                style={[
+                  { width: 60, height: 10, top: "70%", left: "10%" },
+                  styles.cloud
+                ]}
+              />
+              <View
+                style={[
+                  { width: 60, height: 10, top: "80%", left: "80%" },
+                  styles.cloud
+                ]}
+              />
+            </Animated.View>
+          </View>
+          <View style={styles.land}>
+            <TrainTime
+              mode={this.state.mode}
+              currentStation={this.props.currentStation}
+              direction={this.props.direction}
+              nextStop={this.props.nextStop}
+              minutesLeft={this.props.minutesLeft}
+              nextTrainTime={this.props.nextTrainTime}
+              style={{
+                left: this.state.trainX.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [
+                    this.props.direction === "left" ? "-135%" : "210%",
+                    "50%"
+                  ]
+                })
+              }}
             />
-            <View
+            <Animated.View
               style={[
-                { width: 50, height: 10, top: "10%", left: "50%" },
-                styles.cloud
+                {
+                  top: this.state.trainY,
+                  left:
+                    this.props.direction === "left"
+                      ? this.state.trainX.interpolate({
+                          inputRange: [0, 1],
+                          outputRange: ["0%", "87.5%"]
+                        })
+                      : "auto",
+                  right:
+                    this.props.direction === "left"
+                      ? "auto"
+                      : this.state.trainX.interpolate({
+                          inputRange: [0, 1],
+                          outputRange: ["-12.5%", "87.5%"]
+                        })
+                },
+                styles.train
               ]}
-            />
-            <View
-              style={[
-                { width: 35, height: 10, top: "0%", left: "70%" },
-                styles.cloud
-              ]}
-            />
-            <View
-              style={[
-                { width: 35, height: 10, top: "30%", left: "100%" },
-                styles.cloud
-              ]}
-            />
-            <View
-              style={[
-                { width: 50, height: 10, top: "50%", left: "0%" },
-                styles.cloud
-              ]}
-            />
-            <View
-              style={[
-                { width: 60, height: 10, top: "70%", left: "10%" },
-                styles.cloud
-              ]}
-            />
-            <View
-              style={[
-                { width: 60, height: 10, top: "80%", left: "80%" },
-                styles.cloud
-              ]}
-            />
-          </Animated.View>
+            >
+              <View style={styles.windowGroup}>
+                <View style={styles.window} />
+                <View style={styles.window} />
+                <View style={[{ left: -10 }, styles.trainFront]} />
+                {this.props.direction === "left" ? (
+                  <View
+                    style={[styles.trainLight, { left: -trainHeight / 5 }]}
+                  />
+                ) : null}
+              </View>
+              <View style={styles.trainSeparator} />
+              <View style={styles.windowGroup}>
+                <View style={styles.window} />
+                <View style={styles.window} />
+                <View style={[{ right: -10 }, styles.trainFront]} />
+                {this.props.direction === "right" ? (
+                  <View
+                    style={[styles.trainLight, { right: -trainHeight / 5 }]}
+                  />
+                ) : null}
+              </View>
+            </Animated.View>
+          </View>
         </View>
-        <View style={styles.land}>
-          <NextTrainTime
-            nextStop={this.props.nextStop}
-            minutesLeft={this.props.minutesLeft}
-            nextTrainTime={this.props.nextTrainTime}
-            style={{
-              left: this.state.trainX.interpolate({
-                inputRange: [0, 1],
-                outputRange: [
-                  this.props.direction === "left" ? "-135%" : "210%",
-                  "50%"
-                ]
-              })
-            }}
-          />
-          <Animated.View
-            style={[
-              {
-                top: this.state.trainY,
-                left:
-                  this.props.direction === "left"
-                    ? this.state.trainX.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: ["0%", "87.5%"]
-                    })
-                  : "auto",
-                right:
-                  this.props.direction === "left"
-                    ? "auto"
-                  : this.state.trainX.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: ["-12.5%", "87.5%"]
-                      })
-              },
-              styles.train
-            ]}
-          >
-            <View style={styles.windowGroup}>
-              <View style={styles.window} />
-              <View style={styles.window} />
-              <View style={[{ left: -10 }, styles.trainFront]} />
-              {this.props.direction === "left" ? (
-                <View style={[styles.trainLight, { left: -trainHeight / 5 }]} />
-              ) : null}
-            </View>
-            <View style={styles.trainSeparator} />
-            <View style={styles.windowGroup}>
-              <View style={styles.window} />
-              <View style={styles.window} />
-              <View style={[{ right: -10 }, styles.trainFront]} />
-              {this.props.direction === "right" ? (
-                <View
-                  style={[styles.trainLight, { right: -trainHeight / 5 }]}
-                />
-              ) : null}
-            </View>
-          </Animated.View>
-        </View>
-      </View>
+      </TouchableWithoutFeedback>
     );
   }
 }
@@ -613,6 +663,7 @@ class App extends Component {
             style={{ flex: 1 }}
             direction="left"
             nextStop={leftStation ? "MENDOZA" : null}
+            currentStation={this.state.currentStation}
             minutesLeft={
               nextLeftTrainTime &&
               `${differenceInMinutes(
@@ -635,6 +686,7 @@ class App extends Component {
             style={{ flex: 1 }}
             direction="right"
             nextStop={rightStation ? "GUTIERREZ" : null}
+            currentStation={this.state.currentStation}
             minutesLeft={
               nextRightTrainTime &&
               `${differenceInMinutes(
