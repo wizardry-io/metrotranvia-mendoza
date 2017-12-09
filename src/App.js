@@ -165,7 +165,10 @@ class TrainTime extends Component {
     this.state = {
       minutesLeftOpacity: new Animated.Value(1),
       nextTrainTimeOpacity: new Animated.Value(1),
+      minutesLeftModeOpacity: new Animated.Value(1),
+      timesListModeOpacity: new Animated.Value(0),
       minutesLeft: props.minutesLeft,
+      mode: props.mode,
       nextTrainTime: props.nextTrainTime
     };
   }
@@ -190,16 +193,27 @@ class TrainTime extends Component {
         }
       );
     }
+    if (nextProps.mode !== this.props.mode) {
+      Animated.timing(this.state[`${this.props.mode}ModeOpacity`], {
+        toValue: 0
+      }).start(() => {
+        this.setState({ mode: nextProps.mode });
+        Animated.timing(this.state[`${nextProps.mode}ModeOpacity`], {
+          toValue: 1
+        }).start();
+      });
+    }
   }
   render() {
     return (
       <Animated.View style={[this.props.style, styles.nextTrainTime]}>
-        {this.props.mode === "minutesLeft" ? (
-          <View
+        {this.state.mode === "minutesLeft" ? (
+          <Animated.View
             style={{
               width: "100%",
               height: "100%",
-              justifyContent: "space-between"
+              justifyContent: "space-between",
+              opacity: this.state.minutesLeftModeOpacity
             }}
           >
             {this.state.minutesLeft && (
@@ -246,25 +260,33 @@ class TrainTime extends Component {
                 </Text>
               </View>
             )}
-          </View>
+          </Animated.View>
         ) : (
-          <ScrollView
-            style={styles.timesList}
-            contentContainerStyle={{
-              alignItems: "center",
-              justifyContent: "center"
+          <Animated.View
+            style={{
+              opacity: this.state.timesListModeOpacity,
+              height: "100%",
+              width: "100%"
             }}
           >
-            {times.weekdays[this.props.currentStation][
-              this.props.direction === "left"
-                ? "mendozaGutierrezDirection"
-                : "gutierrezMendozaDirection"
-            ].map(time => (
-              <Text key={time} style={{ margin: 5, color: black }}>
-                {time}
-              </Text>
-            ))}
-          </ScrollView>
+            <ScrollView
+              style={styles.timesList}
+              contentContainerStyle={{
+                alignItems: "center",
+                justifyContent: "center"
+              }}
+            >
+              {times.weekdays[this.props.currentStation][
+                this.props.direction === "left"
+                  ? "mendozaGutierrezDirection"
+                  : "gutierrezMendozaDirection"
+              ].map(time => (
+                <Text key={time} style={{ margin: 5, color: black }}>
+                  {time}
+                </Text>
+              ))}
+            </ScrollView>
+          </Animated.View>
         )}
       </Animated.View>
     );
@@ -322,7 +344,7 @@ class TrainScene extends Component {
       <TouchableWithoutFeedback
         onPress={() =>
           this.setState(state => ({
-            mode: state.mode === "minutesLeft" ? "timeList" : "minutesLeft"
+            mode: state.mode === "minutesLeft" ? "timesList" : "minutesLeft"
           }))
         }
       >
