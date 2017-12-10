@@ -736,7 +736,7 @@ class App extends Component {
       leftStation &&
       times[this.state.timePeriod][
         this.state.currentStation
-      ].mendozaGutierrezDirection.find(time => {
+      ].gutierrezMendozaDirection.find(time => {
         const [hours, minutes] = time.split(":");
         return new Date().setHours(hours, minutes) > this.state.currentTime;
       });
@@ -744,7 +744,7 @@ class App extends Component {
       rightStation &&
       times[this.state.timePeriod][
         this.state.currentStation
-      ].gutierrezMendozaDirection.find(time => {
+      ].mendozaGutierrezDirection.find(time => {
         const [hours, minutes] = time.split(":");
         return new Date().setHours(hours, minutes) > this.state.currentTime;
       });
