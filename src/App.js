@@ -9,7 +9,7 @@ import {
   TouchableWithoutFeedback,
   ScrollView
 } from "react-native";
-import GestureRecognizer, { swipeDirections } from "./GestureRecognizer";
+import GestureRecognizer from "./GestureRecognizer";
 import times from "./times.json"; // Source: http://www.transportes.mendoza.gov.ar/mtm/
 
 const skyblue = "#AFD4FF";
@@ -276,7 +276,7 @@ class TrainTime extends Component {
                 justifyContent: "center"
               }}
             >
-              {times.weekdays[this.props.currentStation][
+              {times[this.props.timePeriod][this.props.currentStation][
                 this.props.direction === "left"
                   ? "mendozaGutierrezDirection"
                   : "gutierrezMendozaDirection"
@@ -408,6 +408,7 @@ class TrainScene extends Component {
               nextStop={this.props.nextStop}
               minutesLeft={this.props.minutesLeft}
               nextTrainTime={this.props.nextTrainTime}
+              timePeriod={this.props.timePeriod}
               style={{
                 left: this.state.trainX.interpolate({
                   inputRange: [0, 1],
@@ -469,12 +470,51 @@ class TrainScene extends Component {
   }
 }
 
+const getTimePeriodName = timePeriod => {
+  let timePeriodName = "";
+  switch (timePeriod) {
+    case "weekdays":
+      timePeriodName = "LUNES A VIERNES";
+      break;
+    case "saturdays":
+      timePeriodName = "SÁBADOS";
+      break;
+    case "sundaysAndHolidays":
+      timePeriodName = "DOMINGOS Y FERIADOS";
+      break;
+    default:
+      break;
+  }
+  return timePeriodName;
+};
+
+const toggleTimePeriod = timePeriod => {
+  const timePeriods = ["weekdays", "saturdays", "sundaysAndHolidays"];
+  const currentTimePeriodIndex = timePeriods.indexOf(timePeriod);
+  const nextTimePeriodIndex =
+    currentTimePeriodIndex === timePeriods.length - 1
+      ? 0
+      : currentTimePeriodIndex + 1;
+  return timePeriods[nextTimePeriodIndex];
+};
+
 class Sign extends Component {
-  state = {
-    signScale: new Animated.Value(1),
-    text: "METRO TRANVIA MENDOZA"
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      signScale: new Animated.Value(1),
+      timePeriodOpacity: new Animated.Value(1),
+      timePeriodContainerOpacity: new Animated.Value(0),
+      timePeriod: props.timePeriod,
+      text: "METRO TRANVIA MENDOZA"
+    };
+  }
   componentDidMount() {
+    Animated.timing(this.state.timePeriodContainerOpacity, {
+      toValue: 1,
+      duration: 1000,
+      delay: 2000
+    }).start();
     Animated.timing(this.state.signScale, {
       toValue: 0,
       duration: 1000,
@@ -511,56 +551,53 @@ class Sign extends Component {
         )
       );
     }
+    if (this.props.timePeriod !== this.state.timePeriod) {
+      Animated.timing(this.state.timePeriodOpacity, {
+        toValue: 0
+      }).start(() =>
+        this.setState({ timePeriod: this.props.timePeriod }, () =>
+          Animated.timing(this.state.timePeriodOpacity, {
+            toValue: 1
+          }).start()
+        )
+      );
+    }
   }
   render() {
     return (
       <View style={styles.sign}>
-        <Animated.View
-          style={[
-            {
-              top: 0,
-              left: 0,
-              right: 0,
-              marginRight: "auto",
-              marginLeft: "auto"
-            },
-            styles.innerSign
-          ]}
-        />
-        <Animated.View
-          style={[
-            {
-              top: "50%",
-              left: 0,
-              right: 0,
-              marginRight: "auto",
-              marginLeft: "auto"
-            },
-            styles.innerSign
-          ]}
-        />
-        <Animated.View
-          style={{
-            width: "100%",
-            height: "100%",
-            transform: [{ scaleY: this.state.signScale }],
-            alignItems: "center",
-            justifyContent: "center"
-          }}
+        <TouchableWithoutFeedback
+          onPress={() =>
+            this.props.onTimePeriodChange(
+              toggleTimePeriod(this.state.timePeriod)
+            )
+          }
         >
-          <Text style={styles.signText}>{this.state.text}</Text>
+          <Animated.View
+            style={{
+              flex: 1,
+              width: "100%",
+              backgroundColor: white,
+              marginBottom: 10,
+              justifyContent: "center",
+              alignItems: "center",
+              opacity: this.state.timePeriodContainerOpacity
+            }}
+          >
+            <Animated.Text style={{ opacity: this.state.timePeriodOpacity }}>
+              {getTimePeriodName(this.state.timePeriod)}
+            </Animated.Text>
+          </Animated.View>
+        </TouchableWithoutFeedback>
+        <View style={{ flex: 4, width: "100%" }}>
           <Animated.View
             style={[
               {
-                transform: [
-                  {
-                    skewX: this.state.signScale.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: ["10deg", "0deg"]
-                    })
-                  }
-                ],
-                top: 0
+                top: 0,
+                left: 0,
+                right: 0,
+                marginRight: "auto",
+                marginLeft: "auto"
               },
               styles.innerSign
             ]}
@@ -568,20 +605,59 @@ class Sign extends Component {
           <Animated.View
             style={[
               {
-                transform: [
-                  {
-                    skewX: this.state.signScale.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: ["-10deg", "0deg"]
-                    })
-                  }
-                ],
-                top: "50%"
+                top: "50%",
+                left: 0,
+                right: 0,
+                marginRight: "auto",
+                marginLeft: "auto"
               },
               styles.innerSign
             ]}
           />
-        </Animated.View>
+          <Animated.View
+            style={{
+              width: "100%",
+              height: "100%",
+              transform: [{ scaleY: this.state.signScale }],
+              alignItems: "center",
+              justifyContent: "center"
+            }}
+          >
+            <Text style={styles.signText}>{this.state.text}</Text>
+            <Animated.View
+              style={[
+                {
+                  transform: [
+                    {
+                      skewX: this.state.signScale.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: ["10deg", "0deg"]
+                      })
+                    }
+                  ],
+                  top: 0
+                },
+                styles.innerSign
+              ]}
+            />
+            <Animated.View
+              style={[
+                {
+                  transform: [
+                    {
+                      skewX: this.state.signScale.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: ["-10deg", "0deg"]
+                      })
+                    }
+                  ],
+                  top: "50%"
+                },
+                styles.innerSign
+              ]}
+            />
+          </Animated.View>
+        </View>
       </View>
     );
   }
@@ -605,7 +681,11 @@ const differenceInMinutes = (date, anotherDate) => {
 };
 
 class App extends Component {
-  state = { currentStation: "PEDRO MOLINA", currentTime: new Date() };
+  state = {
+    currentStation: "PEDRO MOLINA",
+    currentTime: new Date(),
+    timePeriod: "weekdays"
+  };
   componentDidMount() {
     const secondsToMilliseconds = 1000;
     const millisecondsUntilNextMinute =
@@ -654,20 +734,20 @@ class App extends Component {
       stations[stations.indexOf(this.state.currentStation) + 1];
     const nextLeftTrainTime =
       leftStation &&
-      times.weekdays[this.state.currentStation].mendozaGutierrezDirection.find(
-        time => {
-          const [hours, minutes] = time.split(":");
-          return new Date().setHours(hours, minutes) > this.state.currentTime;
-        }
-      );
+      times[this.state.timePeriod][
+        this.state.currentStation
+      ].mendozaGutierrezDirection.find(time => {
+        const [hours, minutes] = time.split(":");
+        return new Date().setHours(hours, minutes) > this.state.currentTime;
+      });
     const nextRightTrainTime =
       rightStation &&
-      times.weekdays[this.state.currentStation].gutierrezMendozaDirection.find(
-        time => {
-          const [hours, minutes] = time.split(":");
-          return new Date().setHours(hours, minutes) > this.state.currentTime;
-        }
-      );
+      times[this.state.timePeriod][
+        this.state.currentStation
+      ].gutierrezMendozaDirection.find(time => {
+        const [hours, minutes] = time.split(":");
+        return new Date().setHours(hours, minutes) > this.state.currentTime;
+      });
     return (
       <GestureRecognizer
         onSwipeLeft={this.onSwipeLeft}
@@ -697,9 +777,12 @@ class App extends Component {
               )}'`
             }
             nextTrainTime={nextLeftTrainTime}
+            timePeriod={this.state.timePeriod}
           />
           <Sign
             currentStop={this.state.currentStation}
+            timePeriod={this.state.timePeriod}
+            onTimePeriodChange={timePeriod => this.setState({ timePeriod })}
             onCurrentStation={currentStation =>
               this.setState({ currentStation })
             }
@@ -720,6 +803,7 @@ class App extends Component {
               )}'`
             }
             nextTrainTime={nextRightTrainTime}
+            timePeriod={this.state.timePeriod}
           />
         </View>
       </GestureRecognizer>
