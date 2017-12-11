@@ -173,6 +173,36 @@ class TrainTime extends Component {
     };
   }
   componentWillReceiveProps(nextProps) {
+    // Gradually show current mode
+    if (!this.props.nextStop) {
+      this.setState({ lastNextStop: this.props.nextStop }, () =>
+        // Preserve next stop so we can show it fade out
+        Animated.timing(
+          this.props.mode === "minutesLeft"
+            ? this.state.minutesLeftModeOpacity
+            : this.state.timesListModeOpacity,
+          {
+            toValue: 1
+          }
+        ).start()
+      );
+      return;
+    }
+    // Gradually hide current mode
+    if (!nextProps.nextStop) {
+      this.setState({ lastNextStop: this.props.nextStop }, () =>
+        // Preserve next stop so we can show it fade out
+        Animated.timing(
+          this.props.mode === "minutesLeft"
+            ? this.state.minutesLeftModeOpacity
+            : this.state.timesListModeOpacity,
+          {
+            toValue: 0
+          }
+        ).start()
+      );
+      return;
+    }
     if (nextProps.minutesLeft !== this.props.minutesLeft) {
       Animated.timing(this.state.minutesLeftOpacity, { toValue: 0 }).start(
         () => {
@@ -247,19 +277,20 @@ class TrainTime extends Component {
                 </Animated.Text>
               </View>
             )}
-            {this.props.nextStop && (
-              <View style={[styles.timeText, { marginBottom: 0 }]}>
-                <Text
-                  style={{
-                    fontSize: Dimensions.get("window").height * 0.02,
-                    color: black,
-                    padding: 2.5
-                  }}
-                >
-                  <Text style={{ color: black }}>{this.props.nextStop}</Text>
+            <View style={[styles.timeText, { marginBottom: 0 }]}>
+              <Text
+                style={{
+                  fontSize: Dimensions.get("window").height * 0.02,
+                  color: black,
+                  height: Dimensions.get("window").height * 0.02 + 5,
+                  padding: 2.5
+                }}
+              >
+                <Text style={{ color: black }}>
+                  {this.props.nextStop || this.state.lastNextStop}
                 </Text>
-              </View>
-            )}
+              </Text>
+            </View>
           </Animated.View>
         ) : (
           <Animated.View
