@@ -170,7 +170,7 @@ class TrainTime extends Component {
   }
   componentWillReceiveProps(nextProps) {
     // Gradually show current mode
-    if (!this.props.nextStop) {
+    if (!this.props.nextStop && this.props.nextStop !== nextProps.nextStop) {
       this.setState({ lastNextStop: this.props.nextStop }, () =>
         // Preserve next stop so we can show it fade out
         Animated.timing(
@@ -185,7 +185,7 @@ class TrainTime extends Component {
       return;
     }
     // Gradually hide current mode
-    if (!nextProps.nextStop) {
+    if (!nextProps.nextStop && this.props.nextStop !== nextProps.nextStop) {
       this.setState({ lastNextStop: this.props.nextStop }, () =>
         // Preserve next stop so we can show it fade out
         Animated.timing(
