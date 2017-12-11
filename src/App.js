@@ -591,6 +591,28 @@ class Sign extends Component {
             </Animated.Text>
           </Animated.View>
         </TouchableWithoutFeedback>
+        <TouchableWithoutFeedback onPress={this.props.onLeftTap}>
+          <View
+            style={{
+              position: "absolute",
+              width: "50%",
+              height: "100%",
+              left: 0,
+              zIndex: 1
+            }}
+          />
+        </TouchableWithoutFeedback>
+        <TouchableWithoutFeedback onPress={this.props.onRightTap}>
+          <View
+            style={{
+              position: "absolute",
+              width: "50%",
+              height: "100%",
+              right: 0,
+              zIndex: 1
+            }}
+          />
+        </TouchableWithoutFeedback>
         <View style={{ flex: 4, width: "100%" }}>
           <Animated.View
             style={[
@@ -699,7 +721,7 @@ class App extends Component {
       setInterval(() => this.setState({ currentTime: new Date() }), 60 * 1000);
     }, millisecondsUntilNextMinute);
   }
-  onSwipeRight = gestureState => {
+  setNextStation = gestureState => {
     const currentStationIndex = stations.indexOf(this.state.currentStation);
     const isFirst = currentStationIndex === 0;
     if (isFirst) {
@@ -714,7 +736,7 @@ class App extends Component {
       currentStation
     );
   };
-  onSwipeLeft = gestureState => {
+  setPreviousStation = gestureState => {
     const currentStationIndex = stations.indexOf(this.state.currentStation);
     const isLast = currentStationIndex === stations.length - 1;
     if (isLast) {
@@ -752,8 +774,8 @@ class App extends Component {
       });
     return (
       <GestureRecognizer
-        onSwipeLeft={this.onSwipeLeft}
-        onSwipeRight={this.onSwipeRight}
+        onSwipeLeft={this.setPreviousStation}
+        onSwipeRight={this.setNextStation}
         config={{
           velocityThreshold: 0.1,
           directionalOffsetThreshold: 50
@@ -788,6 +810,8 @@ class App extends Component {
             onCurrentStation={currentStation =>
               this.setState({ currentStation })
             }
+            onLeftTap={this.setNextStation}
+            onRightTap={this.setPreviousStation}
           />
           <TrainScene
             style={{ flex: 1 }}
