@@ -294,8 +294,7 @@ class TrainTime extends Component {
               <Text
                 style={{
                   fontSize: Dimensions.get("window").height * 0.02,
-                  color: black,
-                  height: Dimensions.get("window").height * 0.02
+                  color: black
                 }}
               >
                 {this.props.nextStop || this.state.lastNextStop}
