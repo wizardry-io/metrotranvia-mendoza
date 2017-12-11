@@ -254,7 +254,7 @@ class TrainTime extends Component {
                     fontWeight: "600",
                     opacity: this.state.minutesLeftOpacity,
                     color: black,
-                    padding: 2.5
+                    padding: 1
                   }}
                 >
                   {this.state.minutesLeft}
@@ -269,7 +269,7 @@ class TrainTime extends Component {
                       fontSize: Dimensions.get("window").height * 0.04,
                       opacity: this.state.nextTrainTimeOpacity,
                       color: black,
-                      padding: 2.5
+                      padding: 1
                     }
                   ]}
                 >
@@ -277,18 +277,23 @@ class TrainTime extends Component {
                 </Animated.Text>
               </View>
             )}
-            <View style={[styles.timeText, { marginBottom: 0 }]}>
+            <View
+              style={[
+                styles.timeText,
+                {
+                  marginBottom: 0,
+                  padding: 1
+                }
+              ]}
+            >
               <Text
                 style={{
                   fontSize: Dimensions.get("window").height * 0.02,
                   color: black,
-                  height: Dimensions.get("window").height * 0.02 + 5,
-                  padding: 2.5
+                  height: Dimensions.get("window").height * 0.02
                 }}
               >
-                <Text style={{ color: black }}>
-                  {this.props.nextStop || this.state.lastNextStop}
-                </Text>
+                {this.props.nextStop || this.state.lastNextStop}
               </Text>
             </View>
           </Animated.View>
