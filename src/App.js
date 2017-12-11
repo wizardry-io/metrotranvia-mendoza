@@ -577,6 +577,8 @@ class Sign extends Component {
             style={{
               flex: 1,
               width: "100%",
+              maxWidth: 500,
+              alignSelf: "center",
               backgroundColor: white,
               marginBottom: 10,
               justifyContent: "center",
