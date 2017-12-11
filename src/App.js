@@ -622,29 +622,30 @@ class Sign extends Component {
             </Animated.Text>
           </Animated.View>
         </TouchableWithoutFeedback>
-        <TouchableWithoutFeedback onPress={this.props.onLeftTap}>
-          <View
-            style={{
-              position: "absolute",
-              width: "50%",
-              height: "100%",
-              left: 0,
-              zIndex: 1
-            }}
-          />
-        </TouchableWithoutFeedback>
-        <TouchableWithoutFeedback onPress={this.props.onRightTap}>
-          <View
-            style={{
-              position: "absolute",
-              width: "50%",
-              height: "100%",
-              right: 0,
-              zIndex: 1
-            }}
-          />
-        </TouchableWithoutFeedback>
         <View style={{ flex: 4, width: "100%" }}>
+          <TouchableWithoutFeedback onPress={this.props.onLeftTap}>
+            <View
+              style={{
+                position: "absolute",
+                width: "50%",
+                height: "100%",
+                flex: 1,
+                left: 0,
+                zIndex: 1
+              }}
+            />
+          </TouchableWithoutFeedback>
+          <TouchableWithoutFeedback onPress={this.props.onRightTap}>
+            <View
+              style={{
+                position: "absolute",
+                width: "50%",
+                height: "100%",
+                left: "50%",
+                zIndex: 1
+              }}
+            />
+          </TouchableWithoutFeedback>
           <Animated.View
             style={[
               {
