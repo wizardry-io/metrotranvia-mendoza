@@ -33,14 +33,17 @@ const styles = StyleSheet.create({
     width: "100%"
   },
   sky: {
+    position: "absolute",
     backgroundColor: skyblue,
     width: "100%",
-    flex: 6 / 7
+    height: `100%`
   },
   land: {
+    position: "absolute",
+    top: `${6 / 7 * 100}%`,
     backgroundColor: brown,
     width: "100%",
-    flex: 1 / 7,
+    height: `${1 / 7 * 100}%`,
     borderStyle: "solid",
     borderTopColor: black,
     borderTopWidth: railwayHeight
@@ -234,7 +237,6 @@ class TrainTime extends Component {
           this.props.style,
           styles.nextTrainTime,
           {
-            top: -Dimensions.get("window").height / 4,
             height: Dimensions.get("window").height / 4,
             width: Dimensions.get("window").width / 2
           }
@@ -389,6 +391,32 @@ class TrainScene extends Component {
       >
         <View style={[this.props.style, styles.trainScene]}>
           <View style={styles.sky}>
+            <View style={styles.land} />
+            <TrainTime
+              mode={this.state.mode}
+              currentStation={this.props.currentStation}
+              direction={this.props.direction}
+              nextStop={this.props.nextStop}
+              minutesLeft={this.props.minutesLeft}
+              nextTrainTime={this.props.nextTrainTime}
+              timePeriod={this.props.timePeriod}
+              style={{
+                position: "absolute",
+                bottom: `${1 / 7 * 100}%`,
+                left: this.state.trainX.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [
+                    this.props.direction === "left"
+                      ? -Dimensions.get("window").width -
+                        Dimensions.get("window").width / 2
+                      : 2 * Dimensions.get("window").width +
+                        Dimensions.get("window").width / 2,
+                    Dimensions.get("window").width / 2 -
+                      Dimensions.get("window").width / 4
+                  ]
+                })
+              }}
+            />
             <Animated.View
               style={[
                 { transform: [{ translateX: this.state.cloudsOffset }] },
@@ -438,75 +466,63 @@ class TrainScene extends Component {
                 ]}
               />
             </Animated.View>
-          </View>
-          <View style={styles.land}>
-            <TrainTime
-              mode={this.state.mode}
-              currentStation={this.props.currentStation}
-              direction={this.props.direction}
-              nextStop={this.props.nextStop}
-              minutesLeft={this.props.minutesLeft}
-              nextTrainTime={this.props.nextTrainTime}
-              timePeriod={this.props.timePeriod}
-              style={{
-                left: this.state.trainX.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [
-                    this.props.direction === "left"
-                      ? -Dimensions.get("window").width -
-                        Dimensions.get("window").width / 2
-                      : 2 * Dimensions.get("window").width +
-                        Dimensions.get("window").width / 2,
-                    Dimensions.get("window").width / 2 -
-                      Dimensions.get("window").width / 4
-                  ]
-                })
-              }}
-            />
-            <Animated.View
-              style={[
-                {
-                  top: this.state.trainY,
-                  left:
-                    this.props.direction === "left"
-                      ? this.state.trainX.interpolate({
-                          inputRange: [0, 1],
-                          outputRange: ["0%", "87.5%"]
-                        })
-                      : "auto",
-                  right:
-                    this.props.direction === "left"
-                      ? "auto"
-                      : this.state.trainX.interpolate({
-                          inputRange: [0, 1],
-                          outputRange: ["-12.5%", "87.5%"]
-                        })
-                },
-                styles.train
-              ]}
+            <View
+              style={{ position: "absolute", height: "100%", width: "100%" }}
             >
-              <View style={styles.windowGroup}>
-                <View style={styles.window} />
-                <View style={styles.window} />
-                <View style={[{ left: -10 }, styles.trainFront]} />
-                {this.props.direction === "left" ? (
-                  <View
-                    style={[styles.trainLight, { left: -trainHeight / 5 }]}
-                  />
-                ) : null}
-              </View>
-              <View style={styles.trainSeparator} />
-              <View style={styles.windowGroup}>
-                <View style={styles.window} />
-                <View style={styles.window} />
-                <View style={[{ right: -10 }, styles.trainFront]} />
-                {this.props.direction === "right" ? (
-                  <View
-                    style={[styles.trainLight, { right: -trainHeight / 5 }]}
-                  />
-                ) : null}
-              </View>
-            </Animated.View>
+              <Animated.View
+                style={[
+                  {
+                    top: this.state.trainY.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [
+                        Dimensions.get("window").height / 3 -
+                          Dimensions.get("window").height / 3 * 1 / 7,
+                        1 +
+                          Dimensions.get("window").height / 3 -
+                          Dimensions.get("window").height / 3 * 1 / 7
+                      ]
+                    }),
+                    left:
+                      this.props.direction === "left"
+                        ? this.state.trainX.interpolate({
+                            inputRange: [0, 1],
+                            outputRange: ["0%", "87.5%"]
+                          })
+                        : "auto",
+                    right:
+                      this.props.direction === "left"
+                        ? "auto"
+                        : this.state.trainX.interpolate({
+                            inputRange: [0, 1],
+                            outputRange: ["-12.5%", "87.5%"]
+                          })
+                  },
+                  styles.train
+                ]}
+              >
+                <View style={styles.windowGroup}>
+                  <View style={styles.window} />
+                  <View style={styles.window} />
+                  <View style={[{ left: -10 }, styles.trainFront]} />
+                  {this.props.direction === "left" ? (
+                    <View
+                      style={[styles.trainLight, { left: -trainHeight / 5 }]}
+                    />
+                  ) : null}
+                </View>
+                <View style={styles.trainSeparator} />
+                <View style={styles.windowGroup}>
+                  <View style={styles.window} />
+                  <View style={styles.window} />
+                  <View style={[{ right: -10 }, styles.trainFront]} />
+                  {this.props.direction === "right" ? (
+                    <View
+                      style={[styles.trainLight, { right: -trainHeight / 5 }]}
+                    />
+                  ) : null}
+                </View>
+              </Animated.View>
+            </View>
           </View>
         </View>
       </TouchableWithoutFeedback>
