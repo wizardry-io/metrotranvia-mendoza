@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
     backgroundColor: brown,
     width: "100%",
     flex: 1 / 7,
-    borderTopStyle: "solid",
+    borderStyle: "solid",
     borderTopColor: black,
     borderTopWidth: railwayHeight
   },
@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
     width: "50%",
     height: trainHeight,
     backgroundColor: red,
-    transform: [{ translateY: "-50%" }],
+    transform: [{ translateY: -trainHeight / 2 }],
     flexDirection: "row",
     justifyContent: "space-between",
     maxWidth: trainHeight * 3
@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: 5,
     height: "100%",
-    transform: [{ translateX: "-50%" }, { translateY: "-50%" }],
+    transform: [{ translateX: -2.5 }, { translateY: -trainHeight / 2 }],
     top: "50%",
     left: "50%",
     backgroundColor: black
@@ -88,8 +88,7 @@ const styles = StyleSheet.create({
     height: trainHeight / 5,
     position: "absolute",
     backgroundColor: yellow,
-    bottom: trainHeight * 0.8,
-    boxShadow: `${yellow} 0px 1px 15px`
+    bottom: trainHeight * 0.8
   },
   sign: {
     width: "100%",
@@ -108,29 +107,25 @@ const styles = StyleSheet.create({
     height: "50%",
     width: "100%",
     maxWidth: 500,
-    backgroundColor: white,
-    boxShadow: `${black} 0px 1px 15px`
+    backgroundColor: white
   },
   signText: {
     fontSize: 35,
     fontWeight: "600",
-    color: black,
+    backgroundColor: white,
     textAlign: "center",
     zIndex: 2
   },
   cloud: {
     backgroundColor: white,
     borderRadius: 10,
-    position: "absolute",
-    transform: [{ translateX: "-50%" }, { translateY: "-50%" }]
+    position: "absolute"
   },
   clouds: {
     width: "100%",
-    height: "100%"
+    flex: 1
   },
   nextTrainTime: {
-    width: "50%",
-    transform: [{ translateX: "-50%" }],
     alignItems: "center",
     justifyContent: "center",
     maxWidth: 300,
@@ -240,7 +235,8 @@ class TrainTime extends Component {
           styles.nextTrainTime,
           {
             top: -Dimensions.get("window").height / 4,
-            height: Dimensions.get("window").height / 4
+            height: Dimensions.get("window").height / 4,
+            width: Dimensions.get("window").width / 2
           }
         ]}
       >
@@ -456,8 +452,13 @@ class TrainScene extends Component {
                 left: this.state.trainX.interpolate({
                   inputRange: [0, 1],
                   outputRange: [
-                    this.props.direction === "left" ? "-135%" : "210%",
-                    "50%"
+                    this.props.direction === "left"
+                      ? -Dimensions.get("window").width -
+                        Dimensions.get("window").width / 2
+                      : 2 * Dimensions.get("window").width +
+                        Dimensions.get("window").width / 2,
+                    Dimensions.get("window").width / 2 -
+                      Dimensions.get("window").width / 4
                   ]
                 })
               }}
@@ -661,11 +662,9 @@ class Sign extends Component {
           <Animated.View
             style={[
               {
-                top: 0,
-                left: 0,
-                right: 0,
-                marginRight: "auto",
-                marginLeft: "auto"
+                alignSelf: "center",
+                borderWidth: 1,
+                borderColor: black
               },
               styles.innerSign
             ]}
@@ -674,10 +673,9 @@ class Sign extends Component {
             style={[
               {
                 top: "50%",
-                left: 0,
-                right: 0,
-                marginRight: "auto",
-                marginLeft: "auto"
+                alignSelf: "center",
+                borderWidth: 1,
+                borderColor: black
               },
               styles.innerSign
             ]}
@@ -703,7 +701,9 @@ class Sign extends Component {
                       })
                     }
                   ],
-                  top: 0
+                  top: 0,
+                  borderWidth: 1,
+                  borderColor: black
                 },
                 styles.innerSign
               ]}
@@ -719,7 +719,9 @@ class Sign extends Component {
                       })
                     }
                   ],
-                  top: "50%"
+                  top: "50%",
+                  borderWidth: 1,
+                  borderColor: black
                 },
                 styles.innerSign
               ]}
