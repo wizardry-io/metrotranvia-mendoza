@@ -1,5 +1,15 @@
 {
   "expo": {
-    "sdkVersion": "23.0.0"
+    "name": "MetroTranviaMendoza",
+    "icon": "./icon.png",
+    "version": "1.0.0",
+    "slug": "metrotranviamendoza",
+    "sdkVersion": "23.0.0",
+    "ios": {
+      "bundleIdentifier": "com.wizardry.metrotranviamendoza"
+    },
+    "android": {
+      "package": "com.wizardry.metrotranviamendoza"
+    }
   }
 }
