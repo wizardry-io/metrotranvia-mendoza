@@ -129,8 +129,6 @@ const styles = StyleSheet.create({
     height: "100%"
   },
   nextTrainTime: {
-    top: -Dimensions.get("window").height / 4,
-    height: Dimensions.get("window").height / 4,
     width: "50%",
     transform: [{ translateX: "-50%" }],
     alignItems: "center",
@@ -236,7 +234,16 @@ class TrainTime extends Component {
   }
   render() {
     return (
-      <Animated.View style={[this.props.style, styles.nextTrainTime]}>
+      <Animated.View
+        style={[
+          this.props.style,
+          styles.nextTrainTime,
+          {
+            top: -Dimensions.get("window").height / 4,
+            height: Dimensions.get("window").height / 4
+          }
+        ]}
+      >
         {this.state.mode === "minutesLeft" ? (
           <Animated.View
             style={{
