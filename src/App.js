@@ -704,7 +704,16 @@ class Sign extends Component {
               justifyContent: "center"
             }}
           >
-            <Text style={styles.signText}>{this.state.text}</Text>
+            <Animated.Text
+              style={[
+                styles.signText,
+                {
+                  opacity: this.state.signScale
+                }
+              ]}
+            >
+              {this.state.text}
+            </Animated.Text>
             <Animated.View
               style={[
                 {
