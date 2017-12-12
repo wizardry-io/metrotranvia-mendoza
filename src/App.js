@@ -9,7 +9,6 @@ import {
   TouchableWithoutFeedback,
   Image
 } from "react-native";
-import GestureRecognizer from "./GestureRecognizer";
 import times from "./times.json"; // Source: http://www.transportes.mendoza.gov.ar/mtm/
 
 const skyblue = "#AFD4FF";
@@ -328,7 +327,7 @@ class TrainTime extends Component {
               }}
             >
               {times[this.props.timePeriod][this.props.currentStation][
-                this.props.direction === "left"
+                this.props.direction === "right"
                   ? "mendozaGutierrezDirection"
                   : "gutierrezMendozaDirection"
               ].map(time => (
@@ -875,66 +874,52 @@ class App extends Component {
         return new Date().setHours(hours, minutes) > this.state.currentTime;
       });
     return (
-      <GestureRecognizer
-        onSwipeLeft={this.setPreviousStation}
-        onSwipeRight={this.setNextStation}
-        config={{
-          velocityThreshold: 0.1,
-          directionalOffsetThreshold: 50
-        }}
-        style={{
-          height: "100%"
-        }}
-      >
-        <View style={styles.container}>
-          <TrainScene
-            style={{ flex: 1 }}
-            direction="left"
-            nextStop={leftStation ? "MZA" : null}
-            currentStation={this.state.currentStation}
-            minutesLeft={
-              nextLeftTrainTime &&
-              `${differenceInMinutes(
-                new Date().setHours(
-                  nextLeftTrainTime.split(":")[0],
-                  nextLeftTrainTime.split(":")[1]
-                ),
-                this.state.currentTime
-              )}'`
-            }
-            nextTrainTime={nextLeftTrainTime}
-            timePeriod={this.state.timePeriod}
-          />
-          <Sign
-            currentStop={this.state.currentStation}
-            timePeriod={this.state.timePeriod}
-            onTimePeriodChange={timePeriod => this.setState({ timePeriod })}
-            onCurrentStation={currentStation =>
-              this.setState({ currentStation })
-            }
-            onLeftTap={this.setNextStation}
-            onRightTap={this.setPreviousStation}
-          />
-          <TrainScene
-            style={{ flex: 1 }}
-            direction="right"
-            nextStop={rightStation ? "GUT" : null}
-            currentStation={this.state.currentStation}
-            minutesLeft={
-              nextRightTrainTime &&
-              `${differenceInMinutes(
-                new Date().setHours(
-                  nextRightTrainTime.split(":")[0],
-                  nextRightTrainTime.split(":")[1]
-                ),
-                this.state.currentTime
-              )}'`
-            }
-            nextTrainTime={nextRightTrainTime}
-            timePeriod={this.state.timePeriod}
-          />
-        </View>
-      </GestureRecognizer>
+      <View style={styles.container}>
+        <TrainScene
+          style={{ flex: 1 }}
+          direction="left"
+          nextStop={leftStation ? "MZA" : null}
+          currentStation={this.state.currentStation}
+          minutesLeft={
+            nextLeftTrainTime &&
+            `${differenceInMinutes(
+              new Date().setHours(
+                nextLeftTrainTime.split(":")[0],
+                nextLeftTrainTime.split(":")[1]
+              ),
+              this.state.currentTime
+            )}'`
+          }
+          nextTrainTime={nextLeftTrainTime}
+          timePeriod={this.state.timePeriod}
+        />
+        <Sign
+          currentStop={this.state.currentStation}
+          timePeriod={this.state.timePeriod}
+          onTimePeriodChange={timePeriod => this.setState({ timePeriod })}
+          onCurrentStation={currentStation => this.setState({ currentStation })}
+          onLeftTap={this.setNextStation}
+          onRightTap={this.setPreviousStation}
+        />
+        <TrainScene
+          style={{ flex: 1 }}
+          direction="right"
+          nextStop={rightStation ? "GUT" : null}
+          currentStation={this.state.currentStation}
+          minutesLeft={
+            nextRightTrainTime &&
+            `${differenceInMinutes(
+              new Date().setHours(
+                nextRightTrainTime.split(":")[0],
+                nextRightTrainTime.split(":")[1]
+              ),
+              this.state.currentTime
+            )}'`
+          }
+          nextTrainTime={nextRightTrainTime}
+          timePeriod={this.state.timePeriod}
+        />
+      </View>
     );
   }
 }
