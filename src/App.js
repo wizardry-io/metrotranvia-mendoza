@@ -7,7 +7,7 @@ import {
   Dimensions,
   AsyncStorage,
   TouchableWithoutFeedback,
-  ScrollView
+  Image
 } from "react-native";
 import GestureRecognizer from "./GestureRecognizer";
 import times from "./times.json"; // Source: http://www.transportes.mendoza.gov.ar/mtm/
@@ -131,12 +131,7 @@ const styles = StyleSheet.create({
   nextTrainTime: {
     alignItems: "center",
     justifyContent: "center",
-    maxWidth: 300,
-    backgroundColor: black,
-    paddingLeft: 15,
-    paddingRight: 15,
-    paddingTop: 10,
-    paddingBottom: 10,
+    width: "100%",
     zIndex: 1
   },
   timeText: {
@@ -152,6 +147,12 @@ const styles = StyleSheet.create({
     flex: 1,
     width: "100%",
     backgroundColor: white
+  },
+  nextStop: {
+    position: "absolute",
+    bottom: 0,
+    width: 60,
+    height: 45
   }
 });
 
@@ -237,22 +238,33 @@ class TrainTime extends Component {
           this.props.style,
           styles.nextTrainTime,
           {
-            height: Dimensions.get("window").height / 4,
-            width: Dimensions.get("window").width / 2
+            height: Dimensions.get("window").height / 4
           }
         ]}
       >
         {this.state.mode === "minutesLeft" ? (
-          <Animated.View
+          <View
             style={{
-              width: "100%",
               height: "100%",
-              justifyContent: "space-between",
-              opacity: this.state.minutesLeftModeOpacity
+              justifyContent: "space-around",
+              width: Dimensions.get("window").width / 2,
+              maxWidth: 300,
+              backgroundColor: black,
+              paddingLeft: 15,
+              paddingRight: 15,
+              paddingTop: 10,
+              paddingBottom: 10
             }}
           >
             {this.state.minutesLeft && (
-              <View style={styles.timeText}>
+              <Animated.View
+                style={[
+                  {
+                    opacity: this.state.minutesLeftModeOpacity
+                  },
+                  styles.timeText
+                ]}
+              >
                 <Animated.Text
                   style={{
                     fontSize: Dimensions.get("window").height * 0.08,
@@ -264,14 +276,21 @@ class TrainTime extends Component {
                 >
                   {this.state.minutesLeft}
                 </Animated.Text>
-              </View>
+              </Animated.View>
             )}
             {this.state.nextTrainTime && (
-              <View style={styles.timeText}>
+              <Animated.View
+                style={[
+                  {
+                    opacity: this.state.minutesLeftModeOpacity
+                  },
+                  styles.timeText
+                ]}
+              >
                 <Animated.Text
                   style={[
                     {
-                      fontSize: Dimensions.get("window").height * 0.04,
+                      fontSize: Dimensions.get("window").height * 0.06,
                       opacity: this.state.nextTrainTimeOpacity,
                       color: black,
                       padding: 1
@@ -280,37 +299,29 @@ class TrainTime extends Component {
                 >
                   {this.state.nextTrainTime}
                 </Animated.Text>
-              </View>
+              </Animated.View>
             )}
-            <View
-              style={[
-                styles.timeText,
-                {
-                  marginBottom: 0,
-                  padding: 1
-                }
-              ]}
-            >
-              <Text
-                style={{
-                  fontSize: Dimensions.get("window").height * 0.02,
-                  color: black
-                }}
-              >
-                {this.props.nextStop || this.state.lastNextStop}
-              </Text>
-            </View>
-          </Animated.View>
+          </View>
         ) : (
-          <Animated.View
+          <View
             style={{
-              opacity: this.state.timesListModeOpacity,
               height: "100%",
-              width: "100%"
+              width: Dimensions.get("window").width / 2,
+              maxWidth: 300,
+              backgroundColor: black,
+              paddingLeft: 15,
+              paddingRight: 15,
+              paddingTop: 10,
+              paddingBottom: 10
             }}
           >
-            <ScrollView
-              style={styles.timesList}
+            <Animated.ScrollView
+              style={[
+                {
+                  opacity: this.state.timesListModeOpacity
+                },
+                styles.timesList
+              ]}
               contentContainerStyle={{
                 alignItems: "center",
                 justifyContent: "center"
@@ -325,9 +336,32 @@ class TrainTime extends Component {
                   {time}
                 </Text>
               ))}
-            </ScrollView>
-          </Animated.View>
+            </Animated.ScrollView>
+          </View>
         )}
+        <Image
+          source={require("./direction.png")}
+          style={[
+            styles.nextStop,
+            {
+              right: this.props.direction === "left" ? "auto" : 22.5,
+              left: this.props.direction === "right" ? "auto" : 22.5,
+              transform: this.props.direction === "left" ? [{ scaleX: -1 }] : []
+            }
+          ]}
+        />
+        <Text
+          style={{
+            position: "absolute",
+            fontSize: 12.5,
+            right: this.props.direction === "left" ? "auto" : 47.5,
+            left: this.props.direction === "right" ? "auto" : 47.5,
+            bottom: 22.5,
+            backgroundColor: "transparent"
+          }}
+        >
+          {this.props.nextStop || this.state.lastNextStop}
+        </Text>
       </Animated.View>
     );
   }
@@ -406,11 +440,9 @@ class TrainScene extends Component {
                   inputRange: [0, 1],
                   outputRange: [
                     this.props.direction === "left"
-                      ? -Dimensions.get("window").width -
-                        Dimensions.get("window").width / 2
-                      : 2 * Dimensions.get("window").width +
-                        Dimensions.get("window").width / 2,
-                    Dimensions.get("window").width / 2 -
+                      ? -2 * Dimensions.get("window").width
+                      : 2 * Dimensions.get("window").width,
+                    Dimensions.get("window").width / 4 -
                       Dimensions.get("window").width / 4
                   ]
                 })
@@ -858,7 +890,7 @@ class App extends Component {
           <TrainScene
             style={{ flex: 1 }}
             direction="left"
-            nextStop={leftStation ? "MENDOZA" : null}
+            nextStop={leftStation ? "MZA" : null}
             currentStation={this.state.currentStation}
             minutesLeft={
               nextLeftTrainTime &&
@@ -886,7 +918,7 @@ class App extends Component {
           <TrainScene
             style={{ flex: 1 }}
             direction="right"
-            nextStop={rightStation ? "GUTIERREZ" : null}
+            nextStop={rightStation ? "GUT" : null}
             currentStation={this.state.currentStation}
             minutesLeft={
               nextRightTrainTime &&
