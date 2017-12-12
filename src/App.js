@@ -343,8 +343,8 @@ class TrainTime extends Component {
           style={[
             styles.nextStop,
             {
-              right: this.props.direction === "left" ? "auto" : 22.5,
-              left: this.props.direction === "right" ? "auto" : 22.5,
+              right: this.props.direction === "left" ? "auto" : 10,
+              left: this.props.direction === "right" ? "auto" : 10,
               transform: this.props.direction === "left" ? [{ scaleX: -1 }] : []
             }
           ]}
@@ -353,8 +353,8 @@ class TrainTime extends Component {
           style={{
             position: "absolute",
             fontSize: 12.5,
-            right: this.props.direction === "left" ? "auto" : 47.5,
-            left: this.props.direction === "right" ? "auto" : 47.5,
+            right: this.props.direction === "left" ? "auto" : 10 + 22.5,
+            left: this.props.direction === "right" ? "auto" : 10 + 22.5,
             bottom: 22.5,
             backgroundColor: "transparent"
           }}
