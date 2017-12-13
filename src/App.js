@@ -777,11 +777,15 @@ class App extends Component {
     const millisecondsUntilNextMinute =
       (60 - new Date().getSeconds()) * secondsToMilliseconds;
     // When the next minute starts
-    setTimeout(() => {
+    this.timerTimeout = setTimeout(() => {
       this.setState({ currentTime: new Date() });
       // Update time every one minute
-      setInterval(() => this.setState({ currentTime: new Date() }), 60 * 1000);
+      this.timerInterval = setInterval(() => this.setState({ currentTime: new Date() }), 60 * 1000);
     }, millisecondsUntilNextMinute);
+  }
+  componentWillUnmount() {
+    clearTimeout(this.timerInterval);
+    clearTimeout(this.timerTimeout);
   }
   setNextStation = gestureState => {
     const currentStationIndex = stations.indexOf(this.state.currentStation);
