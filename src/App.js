@@ -7,7 +7,8 @@ import {
   Dimensions,
   AsyncStorage,
   TouchableWithoutFeedback,
-  Image
+  Image,
+  ScrollView
 } from "react-native";
 import times from "./times.json"; // Source: http://www.transportes.mendoza.gov.ar/mtm/
 
@@ -160,74 +161,76 @@ class TrainTime extends Component {
     super(props);
     this.state = {
       minutesLeftOpacity: new Animated.Value(1),
-      nextTrainTimeOpacity: new Animated.Value(1),
-      minutesLeftModeOpacity: new Animated.Value(1),
-      timesListModeOpacity: new Animated.Value(0),
+      trainTimeOpacity: new Animated.Value(1),
       minutesLeft: props.minutesLeft,
-      mode: props.mode,
-      nextTrainTime: props.nextTrainTime
+      nextTrainTime: props.nextTrainTime,
+      timeList:
+        times[props.timePeriod][props.currentStation][
+          props.direction === "right"
+            ? "mendozaGutierrezDirection"
+            : "gutierrezMendozaDirection"
+        ]
     };
   }
+  componentDidMount() {
+    const nextTrainTimeIndex = times[this.props.timePeriod][
+      this.props.currentStation
+    ][
+      this.props.direction === "right"
+        ? "mendozaGutierrezDirection"
+        : "gutierrezMendozaDirection"
+    ].indexOf(this.props.nextTrainTime);
+    this.scrollView && this.scrollView.scrollTo({ y: 30 * nextTrainTimeIndex });
+  }
   componentWillReceiveProps(nextProps) {
-    // Gradually show current mode
+    // Gradually show
     if (!this.props.nextStop && this.props.nextStop !== nextProps.nextStop) {
       this.setState({ lastNextStop: this.props.nextStop }, () =>
         // Preserve next stop so we can show it fade out
-        Animated.timing(
-          this.props.mode === "minutesLeft"
-            ? this.state.minutesLeftModeOpacity
-            : this.state.timesListModeOpacity,
-          {
-            toValue: 1
-          }
-        ).start()
+        Animated.timing(this.state.trainTimeOpacity, {
+          toValue: 1
+        }).start()
       );
       return;
     }
-    // Gradually hide current mode
+    // Gradually hide
     if (!nextProps.nextStop && this.props.nextStop !== nextProps.nextStop) {
       this.setState({ lastNextStop: this.props.nextStop }, () =>
         // Preserve next stop so we can show it fade out
-        Animated.timing(
-          this.props.mode === "minutesLeft"
-            ? this.state.minutesLeftModeOpacity
-            : this.state.timesListModeOpacity,
-          {
-            toValue: 0
-          }
-        ).start()
+        Animated.timing(this.state.trainTimeOpacity, {
+          toValue: 0
+        }).start()
       );
       return;
     }
     if (nextProps.minutesLeft !== this.props.minutesLeft) {
       Animated.timing(this.state.minutesLeftOpacity, { toValue: 0 }).start(
         () => {
-          this.setState({ minutesLeft: nextProps.minutesLeft });
+          this.setState({
+            minutesLeft: nextProps.minutesLeft,
+            timeList:
+              times[nextProps.timePeriod][nextProps.currentStation][
+                nextProps.direction === "right"
+                  ? "mendozaGutierrezDirection"
+                  : "gutierrezMendozaDirection"
+              ]
+          });
+          const nextTrainTimeIndex = times[nextProps.timePeriod][
+            nextProps.currentStation
+          ][
+            nextProps.direction === "right"
+              ? "mendozaGutierrezDirection"
+              : "gutierrezMendozaDirection"
+          ].indexOf(nextProps.nextTrainTime);
           Animated.timing(this.state.minutesLeftOpacity, {
             toValue: 1
-          }).start();
+          }).start(
+            () =>
+              this.scrollView &&
+              this.scrollView.scrollTo({ y: 30 * nextTrainTimeIndex })
+          );
         }
       );
-    }
-    if (nextProps.nextTrainTime !== this.props.nextTrainTime) {
-      Animated.timing(this.state.nextTrainTimeOpacity, { toValue: 0 }).start(
-        () => {
-          this.setState({ nextTrainTime: nextProps.nextTrainTime });
-          Animated.timing(this.state.nextTrainTimeOpacity, {
-            toValue: 1
-          }).start();
-        }
-      );
-    }
-    if (nextProps.mode !== this.props.mode) {
-      Animated.timing(this.state[`${this.props.mode}ModeOpacity`], {
-        toValue: 0
-      }).start(() => {
-        this.setState({ mode: nextProps.mode });
-        Animated.timing(this.state[`${nextProps.mode}ModeOpacity`], {
-          toValue: 1
-        }).start();
-      });
     }
   }
   render() {
@@ -241,103 +244,73 @@ class TrainTime extends Component {
           }
         ]}
       >
-        {this.state.mode === "minutesLeft" ? (
-          <View
-            style={{
-              height: "100%",
-              justifyContent: "space-around",
-              width: Dimensions.get("window").width / 2,
-              maxWidth: 300,
-              backgroundColor: black,
-              paddingLeft: 15,
-              paddingRight: 15,
-              paddingTop: 10,
-              paddingBottom: 10
-            }}
-          >
-            {this.state.minutesLeft && (
-              <Animated.View
-                style={[
-                  {
-                    opacity: this.state.minutesLeftModeOpacity
-                  },
-                  styles.timeText
-                ]}
-              >
-                <Animated.Text
-                  style={{
-                    fontSize: Dimensions.get("window").height * 0.08,
-                    fontWeight: "600",
-                    opacity: this.state.minutesLeftOpacity,
-                    color: black,
-                    padding: 1
-                  }}
-                >
-                  {this.state.minutesLeft}
-                </Animated.Text>
-              </Animated.View>
-            )}
-            {this.state.nextTrainTime && (
-              <Animated.View
-                style={[
-                  {
-                    opacity: this.state.minutesLeftModeOpacity
-                  },
-                  styles.timeText
-                ]}
-              >
-                <Animated.Text
-                  style={[
-                    {
-                      fontSize: Dimensions.get("window").height * 0.06,
-                      opacity: this.state.nextTrainTimeOpacity,
-                      color: black,
-                      padding: 1
-                    }
-                  ]}
-                >
-                  {this.state.nextTrainTime}
-                </Animated.Text>
-              </Animated.View>
-            )}
-          </View>
-        ) : (
-          <View
-            style={{
-              height: "100%",
-              width: Dimensions.get("window").width / 2,
-              maxWidth: 300,
-              backgroundColor: black,
-              paddingLeft: 15,
-              paddingRight: 15,
-              paddingTop: 10,
-              paddingBottom: 10
-            }}
-          >
-            <Animated.ScrollView
+        <View
+          style={{
+            height: "100%",
+            justifyContent: "space-around",
+            width: Dimensions.get("window").width / 2,
+            maxWidth: 300,
+            backgroundColor: black,
+            paddingLeft: 15,
+            paddingRight: 15,
+            paddingTop: 10,
+            paddingBottom: 10
+          }}
+        >
+          {this.state.minutesLeft && (
+            <Animated.View
               style={[
                 {
-                  opacity: this.state.timesListModeOpacity
+                  opacity: this.state.trainTimeOpacity
                 },
+                styles.timeText
+              ]}
+            >
+              <Animated.Text
+                style={{
+                  fontSize: Dimensions.get("window").height * 0.08,
+                  fontWeight: "600",
+                  opacity: this.state.minutesLeftOpacity,
+                  color: black,
+                  padding: 1
+                }}
+              >
+                {this.state.minutesLeft}
+              </Animated.Text>
+            </Animated.View>
+          )}
+          {this.state.nextTrainTime && (
+            <Animated.View
+              style={[
+                { opacity: this.state.trainTimeOpacity },
                 styles.timesList
               ]}
-              contentContainerStyle={{
-                alignItems: "center",
-                justifyContent: "center"
-              }}
             >
-              {times[this.props.timePeriod][this.props.currentStation][
-                this.props.direction === "right"
-                  ? "mendozaGutierrezDirection"
-                  : "gutierrezMendozaDirection"
-              ].map(time => (
-                <Text key={time} style={{ margin: 5, color: black }}>
-                  {time}
-                </Text>
-              ))}
-            </Animated.ScrollView>
-          </View>
-        )}
+              <ScrollView
+                ref={scrollView => {
+                  this.scrollView = scrollView;
+                }}
+                contentContainerStyle={{
+                  alignItems: "center",
+                  justifyContent: "center"
+                }}
+              >
+                {this.state.timeList.map(time => (
+                  <Animated.Text
+                    key={time}
+                    style={{
+                      height: 30,
+                      color: time === this.props.nextTrainTime ? red : black,
+                      opacity: this.state.minutesLeftOpacity
+                    }}
+                  >
+                    {time}
+                  </Animated.Text>
+                ))}
+              </ScrollView>
+            </Animated.View>
+          )}
+        </View>
         <Image
           source={require("./direction.png")}
           style={[
@@ -400,8 +373,7 @@ class TrainScene extends Component {
     trainY: new Animated.Value(initialTrainY),
     cloudsOffset: new Animated.Value(
       initialCloudOffset * (this.props.direction === "left" ? -1 : 1)
-    ),
-    mode: "minutesLeft"
+    )
   };
   componentDidMount() {
     moveTrainY(this.state.trainY, initialTrainY, -2.5);
@@ -414,148 +386,137 @@ class TrainScene extends Component {
   }
   render() {
     return (
-      <TouchableWithoutFeedback
-        onPress={() =>
-          this.setState(state => ({
-            mode: state.mode === "minutesLeft" ? "timesList" : "minutesLeft"
-          }))
-        }
-      >
-        <View style={[this.props.style, styles.trainScene]}>
-          <View style={styles.sky}>
-            <View style={styles.land} />
-            <TrainTime
-              mode={this.state.mode}
-              currentStation={this.props.currentStation}
-              direction={this.props.direction}
-              nextStop={this.props.nextStop}
-              minutesLeft={this.props.minutesLeft}
-              nextTrainTime={this.props.nextTrainTime}
-              timePeriod={this.props.timePeriod}
-              style={{
-                position: "absolute",
-                bottom: `${1 / 7 * 100}%`,
-                left: this.state.trainX.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [
-                    this.props.direction === "left"
-                      ? -2 * Dimensions.get("window").width
-                      : 2 * Dimensions.get("window").width,
-                    Dimensions.get("window").width / 4 -
-                      Dimensions.get("window").width / 4
-                  ]
-                })
-              }}
+      <View style={[this.props.style, styles.trainScene]}>
+        <View style={styles.sky}>
+          <View style={styles.land} />
+          <TrainTime
+            currentStation={this.props.currentStation}
+            direction={this.props.direction}
+            nextStop={this.props.nextStop}
+            minutesLeft={this.props.minutesLeft}
+            nextTrainTime={this.props.nextTrainTime}
+            timePeriod={this.props.timePeriod}
+            style={{
+              position: "absolute",
+              bottom: `${1 / 7 * 100}%`,
+              left: this.state.trainX.interpolate({
+                inputRange: [0, 1],
+                outputRange: [
+                  this.props.direction === "left"
+                    ? -2 * Dimensions.get("window").width
+                    : 2 * Dimensions.get("window").width,
+                  Dimensions.get("window").width / 4 -
+                    Dimensions.get("window").width / 4
+                ]
+              })
+            }}
+          />
+          <Animated.View
+            style={[
+              { transform: [{ translateX: this.state.cloudsOffset }] },
+              styles.clouds
+            ]}
+          >
+            <View
+              style={[
+                { width: 30, height: 10, top: "20%", left: "20%" },
+                styles.cloud
+              ]}
             />
+            <View
+              style={[
+                { width: 50, height: 10, top: "10%", left: "50%" },
+                styles.cloud
+              ]}
+            />
+            <View
+              style={[
+                { width: 35, height: 10, top: "0%", left: "70%" },
+                styles.cloud
+              ]}
+            />
+            <View
+              style={[
+                { width: 35, height: 10, top: "30%", left: "100%" },
+                styles.cloud
+              ]}
+            />
+            <View
+              style={[
+                { width: 50, height: 10, top: "50%", left: "0%" },
+                styles.cloud
+              ]}
+            />
+            <View
+              style={[
+                { width: 60, height: 10, top: "70%", left: "10%" },
+                styles.cloud
+              ]}
+            />
+            <View
+              style={[
+                { width: 60, height: 10, top: "80%", left: "80%" },
+                styles.cloud
+              ]}
+            />
+          </Animated.View>
+          <View style={{ position: "absolute", height: "100%", width: "100%" }}>
             <Animated.View
               style={[
-                { transform: [{ translateX: this.state.cloudsOffset }] },
-                styles.clouds
+                {
+                  top: this.state.trainY.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [
+                      Dimensions.get("window").height / 3 -
+                        Dimensions.get("window").height / 3 * 1 / 7,
+                      1 +
+                        Dimensions.get("window").height / 3 -
+                        Dimensions.get("window").height / 3 * 1 / 7
+                    ]
+                  }),
+                  left:
+                    this.props.direction === "left"
+                      ? this.state.trainX.interpolate({
+                          inputRange: [0, 1],
+                          outputRange: ["0%", "87.5%"]
+                        })
+                      : "auto",
+                  right:
+                    this.props.direction === "left"
+                      ? "auto"
+                      : this.state.trainX.interpolate({
+                          inputRange: [0, 1],
+                          outputRange: ["-12.5%", "87.5%"]
+                        })
+                },
+                styles.train
               ]}
             >
-              <View
-                style={[
-                  { width: 30, height: 10, top: "20%", left: "20%" },
-                  styles.cloud
-                ]}
-              />
-              <View
-                style={[
-                  { width: 50, height: 10, top: "10%", left: "50%" },
-                  styles.cloud
-                ]}
-              />
-              <View
-                style={[
-                  { width: 35, height: 10, top: "0%", left: "70%" },
-                  styles.cloud
-                ]}
-              />
-              <View
-                style={[
-                  { width: 35, height: 10, top: "30%", left: "100%" },
-                  styles.cloud
-                ]}
-              />
-              <View
-                style={[
-                  { width: 50, height: 10, top: "50%", left: "0%" },
-                  styles.cloud
-                ]}
-              />
-              <View
-                style={[
-                  { width: 60, height: 10, top: "70%", left: "10%" },
-                  styles.cloud
-                ]}
-              />
-              <View
-                style={[
-                  { width: 60, height: 10, top: "80%", left: "80%" },
-                  styles.cloud
-                ]}
-              />
+              <View style={styles.windowGroup}>
+                <View style={styles.window} />
+                <View style={styles.window} />
+                <View style={[{ left: -10 }, styles.trainFront]} />
+                {this.props.direction === "left" ? (
+                  <View
+                    style={[styles.trainLight, { left: -trainHeight / 5 }]}
+                  />
+                ) : null}
+              </View>
+              <View style={styles.trainSeparator} />
+              <View style={styles.windowGroup}>
+                <View style={styles.window} />
+                <View style={styles.window} />
+                <View style={[{ right: -10 }, styles.trainFront]} />
+                {this.props.direction === "right" ? (
+                  <View
+                    style={[styles.trainLight, { right: -trainHeight / 5 }]}
+                  />
+                ) : null}
+              </View>
             </Animated.View>
-            <View
-              style={{ position: "absolute", height: "100%", width: "100%" }}
-            >
-              <Animated.View
-                style={[
-                  {
-                    top: this.state.trainY.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: [
-                        Dimensions.get("window").height / 3 -
-                          Dimensions.get("window").height / 3 * 1 / 7,
-                        1 +
-                          Dimensions.get("window").height / 3 -
-                          Dimensions.get("window").height / 3 * 1 / 7
-                      ]
-                    }),
-                    left:
-                      this.props.direction === "left"
-                        ? this.state.trainX.interpolate({
-                            inputRange: [0, 1],
-                            outputRange: ["0%", "87.5%"]
-                          })
-                        : "auto",
-                    right:
-                      this.props.direction === "left"
-                        ? "auto"
-                        : this.state.trainX.interpolate({
-                            inputRange: [0, 1],
-                            outputRange: ["-12.5%", "87.5%"]
-                          })
-                  },
-                  styles.train
-                ]}
-              >
-                <View style={styles.windowGroup}>
-                  <View style={styles.window} />
-                  <View style={styles.window} />
-                  <View style={[{ left: -10 }, styles.trainFront]} />
-                  {this.props.direction === "left" ? (
-                    <View
-                      style={[styles.trainLight, { left: -trainHeight / 5 }]}
-                    />
-                  ) : null}
-                </View>
-                <View style={styles.trainSeparator} />
-                <View style={styles.windowGroup}>
-                  <View style={styles.window} />
-                  <View style={styles.window} />
-                  <View style={[{ right: -10 }, styles.trainFront]} />
-                  {this.props.direction === "right" ? (
-                    <View
-                      style={[styles.trainLight, { right: -trainHeight / 5 }]}
-                    />
-                  ) : null}
-                </View>
-              </Animated.View>
-            </View>
           </View>
         </View>
-      </TouchableWithoutFeedback>
+      </View>
     );
   }
 }
