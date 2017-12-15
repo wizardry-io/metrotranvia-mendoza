@@ -286,6 +286,11 @@ class TrainTime extends Component {
                 styles.timesList
               ]}
             >
+              <Animated.View
+                style={{
+                  opacity: this.state.minutesLeftOpacity
+                }}
+              >
               <ScrollView
                 ref={scrollView => {
                   this.scrollView = scrollView;
@@ -300,14 +305,14 @@ class TrainTime extends Component {
                     key={time}
                     style={{
                       height: 30,
-                      color: time === this.props.nextTrainTime ? red : black,
-                      opacity: this.state.minutesLeftOpacity
+                        color: time === this.props.nextTrainTime ? red : black
                     }}
                   >
                     {time}
                   </Animated.Text>
                 ))}
               </ScrollView>
+            </Animated.View>
             </Animated.View>
           )}
         </View>
