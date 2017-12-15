@@ -291,28 +291,28 @@ class TrainTime extends Component {
                   opacity: this.state.minutesLeftOpacity
                 }}
               >
-              <ScrollView
-                ref={scrollView => {
-                  this.scrollView = scrollView;
-                }}
-                contentContainerStyle={{
-                  alignItems: "center",
-                  justifyContent: "center"
-                }}
-              >
-                {this.state.timeList.map(time => (
-                  <Animated.Text
-                    key={time}
-                    style={{
-                      height: 30,
+                <ScrollView
+                  ref={scrollView => {
+                    this.scrollView = scrollView;
+                  }}
+                  contentContainerStyle={{
+                    alignItems: "center",
+                    justifyContent: "center"
+                  }}
+                >
+                  {this.state.timeList.map(time => (
+                    <Animated.Text
+                      key={time}
+                      style={{
+                        height: 30,
                         color: time === this.props.nextTrainTime ? red : black
-                    }}
-                  >
-                    {time}
-                  </Animated.Text>
-                ))}
-              </ScrollView>
-            </Animated.View>
+                      }}
+                    >
+                      {time}
+                    </Animated.Text>
+                  ))}
+                </ScrollView>
+              </Animated.View>
             </Animated.View>
           )}
         </View>
@@ -754,14 +754,7 @@ class Sign extends Component {
   }
 }
 
-const stations = [
-  "MENDOZA",
-  "PEDRO MOLINA",
-  "SAN MARTIN",
-  "PROGRESO",
-  "LUZURIAGA",
-  "GUTIERREZ"
-];
+const stations = Object.keys(times.weekdays);
 
 const differenceInMinutes = (date, anotherDate) => {
   const millisecondsToSeconds = 1 / 1000;
@@ -785,7 +778,10 @@ class App extends Component {
     this.timerTimeout = setTimeout(() => {
       this.setState({ currentTime: new Date() });
       // Update time every one minute
-      this.timerInterval = setInterval(() => this.setState({ currentTime: new Date() }), 60 * 1000);
+      this.timerInterval = setInterval(
+        () => this.setState({ currentTime: new Date() }),
+        60 * 1000
+      );
     }, millisecondsUntilNextMinute);
   }
   componentWillUnmount() {

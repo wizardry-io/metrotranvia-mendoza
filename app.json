@@ -2,7 +2,7 @@
   "expo": {
     "name": "MetroTranviaMendoza",
     "icon": "./icon.png",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "slug": "metrotranviamendoza",
     "orientation": "portrait",
     "sdkVersion": "23.0.0",
@@ -10,7 +10,7 @@
       "bundleIdentifier": "com.wizardry.metrotranviamendoza"
     },
     "android": {
-      "versionCode": 5,
+      "versionCode": 6,
       "package": "com.wizardry.metrotranviamendoza",
       "permissions": ["WAKE_LOCK"]
     }
