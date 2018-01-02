@@ -288,20 +288,22 @@ class TrainTime extends Component {
             >
               <Animated.View
                 style={{
-                  opacity: this.state.minutesLeftOpacity
+                  opacity: this.state.minutesLeftOpacity,
+                  flex: 1
                 }}
               >
                 <ScrollView
                   ref={scrollView => {
                     this.scrollView = scrollView;
                   }}
+                  style={{ flex: 1 }}
                   contentContainerStyle={{
                     alignItems: "center",
                     justifyContent: "center"
                   }}
                 >
                   {this.state.timeList.map(time => (
-                    <Animated.Text
+                    <Text
                       key={time}
                       style={{
                         height: 30,
@@ -309,7 +311,7 @@ class TrainTime extends Component {
                       }}
                     >
                       {time}
-                    </Animated.Text>
+                    </Text>
                   ))}
                 </ScrollView>
               </Animated.View>
