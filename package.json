@@ -1,6 +1,6 @@
 {
   "name": "metrotranvia-mendoza",
-  "version": "0.1.0",
+  "version": "1.0.5",
   "private": true,
   "main": "./node_modules/react-native-scripts/build/bin/crna-entry.js",
   "dependencies": {
